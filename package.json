@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/webix": "^4.2.0",
     "webix": "^4.3.0"
   }
 }
