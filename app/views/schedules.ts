@@ -1,17 +1,16 @@
 import uiWrappers = require( "models/uiWrappers" );
-declare let $: any; // So we can use JQuery for this one thing
 
 export = new class {
     $ui: any;
 
     constructor() {
-        let calendar = {
+        let calendar: webix.ui.templateConfig = {
             view: "template",
             template: "<div id='calendar'></div>",
             id: "calendar"
         }
 
-        let list = {
+        let list: webix.ui.datatableConfig = {
             view:"datatable",
             select: true,
             autowidth: true,
@@ -43,7 +42,8 @@ export = new class {
         }
 
         const buttons = [
-            { view:"button", id:"LoadBut", type: "icon", icon: "mail", label: "Mail", align:"left" },
+            { view:"button", id:"addEvent", type: "form", align:"left", label: "Add Event", autowidth: true },
+            { view:"button", id:"deleteEvent", type: "danger", align:"left", label: "Delete Event", autowidth: true }
         ]
 
         this.$ui = uiWrappers.wrapInLayout( {
