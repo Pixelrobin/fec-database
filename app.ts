@@ -12,7 +12,7 @@ var app = core.create({
     name:       "My App!",
     version:    "0.1.0",
     debug:      true,
-    start:      "/top/"
+    start:      "/top/home"
 });
 
 app.use(menu);

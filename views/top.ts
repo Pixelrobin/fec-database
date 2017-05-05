@@ -6,38 +6,38 @@ class TopView {
 
     constructor() {
         var header = {
-            type: "toolbar",
-            height: 45,
+            view: "toolbar",
+            type: "header",
+            height: 56,
+            padding: 0,
             borderless: true,
-            rows: [
+            elements: [
                 {
                     view: "template",
-                    template: "Look! A title!"
+                    template: "<h3>Lanes and Lasers<h3>",
+                    css: "headerbar",
+                    padding: 0
                 }
             ]
         };
 
         var menu = {
-            view:"list", id:"top:menu", 
+            view:"menu", id:"top:menu", 
             width:180, layout:"y", select:true,
+            padding: 0,
             scroll: false,
+            css: "sidemenu",
+            template:"<span class='webix_icon fa-#icon#'></span> #value# ",
             data:[
-                { value:"DashBoard", 		id:"start",		href:"#!/top/start", 		icon:"envelope-o" },
-                { value:"Data", 			id:"data",		href:"#!/top/data", 		icon:"briefcase" },
+                { value: "DashBoard",  id: "start", href: "#!/top/start", icon: "envelope-o" },
+                { value: "Home",       id: "home",  href: "#!/top/home",  icon: "briefcase"  },
+                { value: "Employees", id: "employees", href: "#!/top/employees"},
+                { value: "Schedules",  id: "schedules", href: "#!top/schedules"},
+                { value: "Attendence", id: "attendence", href: "#!top/attendence" }
             ]
         };
 
         var ui = {
-            /*type:"layout", cols:[
-                { type:"clean", css:"app-left-panel",
-                    padding:10, margin:20, borderless:true, rows: [ header, menu ]},
-                { rows:[ { height:10}, 
-                    { type:"clean", css:"app-right-panel", padding:4, rows:[
-                        { $subview:true } 
-                    ]}
-                ]}
-            ]*/
-            type: "layout",
             rows: [
                 header,
                 {
