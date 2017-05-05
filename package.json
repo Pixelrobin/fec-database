@@ -13,5 +13,8 @@
   ],
   "devDependencies": {},
   "dependencies": {
+    "@types/electron": "^1.4.37",
+    "@types/node": "^7.0.18",
+    "@types/webix": "^4.2.0"
   }
 }
