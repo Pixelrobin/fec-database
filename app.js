@@ -1,7 +1,7 @@
 /*
     App configuration
 */
-define("app", ["require", "exports", "libs/webix-jet-core/core", "libs/webix-jet-core/plugins/menu"], function (require, exports, core, menu) {
+define("app", ["require", "exports", "libs/webix-jet-core/core", "libs/webix-jet-core/plugins/menu", "path", "url"], function (require, exports, core, menu, path, url) {
     "use strict";
     //configuration
     var app = core.create({
@@ -12,13 +12,25 @@ define("app", ["require", "exports", "libs/webix-jet-core/core", "libs/webix-jet
         start: "/top/home"
     });
     app.use(menu);
+    console.log(url.format({
+        pathname: path.join(__dirname, 'app/index.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+    console.log("hey");
     return app;
 });
 define("models/uiWrappers", ["require", "exports"], function (require, exports) {
     "use strict";
     var uiWrappers;
     (function (uiWrappers) {
-        function wrapInTitle(ui, template) {
+        function wrapInTitle(ui, template, buttons) {
+            var btns = buttons === undefined ? [] : buttons, cols = [
+                {
+                    view: "label",
+                    label: template
+                }
+            ].concat(btns);
             return {
                 margin: 0,
                 padding: 0,
@@ -28,13 +40,8 @@ define("models/uiWrappers", ["require", "exports"], function (require, exports) 
                         borderless: true,
                         height: 36,
                         padding: 0,
-                        cols: [
-                            {
-                                view: "template",
-                                template: template,
-                                css: "headerbar",
-                            }
-                        ]
+                        cols: cols,
+                        css: "headerbar"
                     },
                     ui
                 ]
@@ -114,8 +121,8 @@ define("views/employees", ["require", "exports", "models/uiWrappers"], function 
                     { view: "text", placeholder: "Ex. (123) 456-789", label: "Phone", labelWidth: 100 },
                     { view: "textarea", placeholder: "Any comments you have go here...", label: "Comments", labelWidth: 100 },
                     { cols: [
-                            { view: "button", value: "Save", type: "form" },
-                            { view: "button", value: "Cancel" }
+                            { view: "button", value: "Save", type: "form", autoWidth: true },
+                            { view: "button", value: "Cancel", autoWidth: true }
                         ] }
                 ]
             };
@@ -209,6 +216,9 @@ define("views/schedules", ["require", "exports", "models/uiWrappers"], function 
                         ] }
                 ]
             };
+            var buttons = [
+                { view: "button", id: "LoadBut", type: "icon", icon: "mail", label: "Mail", align: "left" },
+            ];
             this.$ui = uiWrappers.wrapInLayout({
                 cols: [
                     {
@@ -218,7 +228,7 @@ define("views/schedules", ["require", "exports", "models/uiWrappers"], function 
                             uiWrappers.wrapInTitle(form, "Event Editor")
                         ]
                     },
-                    uiWrappers.wrapInTitle(calendar, "Outlook"),
+                    uiWrappers.wrapInTitle(calendar, "Outlook", buttons),
                 ]
             });
         }

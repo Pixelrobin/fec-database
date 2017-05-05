@@ -6,3 +6,7 @@
 .layout {
     background-color: #ddd;
 }
+
+.transparent-background {
+    background: transparent;
+}

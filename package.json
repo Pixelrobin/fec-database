@@ -2,7 +2,7 @@
   "name": "my-app",
   "version": "0.1.0",
   "description": "My App!",
-  "main": "app.js",
+  "main": "main.js",
   "scripts": {
     "build": "gulp build",
     "build-pro": "gulp build --pro",
@@ -13,6 +13,5 @@
   ],
   "devDependencies": {},
   "dependencies": {
-    "@types/typescript": "^2.0.0"
   }
 }

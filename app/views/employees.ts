@@ -36,8 +36,8 @@ export = new class {
                 { view: "text", placeholder: "Ex. (123) 456-789", label: "Phone", labelWidth: 100 },
                 { view: "textarea", placeholder: "Any comments you have go here...", label: "Comments", labelWidth: 100 },
                 { cols: [
-                    { view:"button", value:"Save", type: "form" },
-                    { view:"button", value:"Cancel" }
+                    { view:"button", value:"Save", type: "form", autoWidth: true },
+                    { view:"button", value:"Cancel", autoWidth: true }
                 ]}
 
             ]

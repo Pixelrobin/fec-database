@@ -4,7 +4,8 @@
 
 import core = require( "libs/webix-jet-core/core" )
 import menu = require( "libs/webix-jet-core/plugins/menu" )
-
+const path = nodeRequire('path');
+const url = nodeRequire( 'url' );
 
 //configuration
 var app = core.create({
@@ -16,5 +17,12 @@ var app = core.create({
 });
 
 app.use(menu);
+
+console.log( url.format({
+    pathname: path.join(__dirname, 'app/index.html'),
+    protocol: 'file:',
+    slashes: true
+  }))
+  console.log( "hey");
 
 export = app;

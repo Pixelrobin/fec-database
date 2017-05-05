@@ -36,7 +36,7 @@ class TopView {
                 { value: "Attendence", id: "attendence", href: "#!top/attendence" }
             ]
         };
-
+        
         var ui = {
             rows: [
                 header,

@@ -42,6 +42,10 @@ export = new class {
             ]
         }
 
+        const buttons = [
+            { view:"button", id:"LoadBut", type: "icon", icon: "mail", label: "Mail", align:"left" },
+        ]
+
         this.$ui = uiWrappers.wrapInLayout( {
                 cols: [
                     {
@@ -51,7 +55,7 @@ export = new class {
                             uiWrappers.wrapInTitle( form, "Event Editor" )
                         ]
                     },
-                    uiWrappers.wrapInTitle( calendar, "Outlook" ),
+                    uiWrappers.wrapInTitle( calendar, "Outlook", buttons ),
                     
                 ]
             }

@@ -1,5 +1,13 @@
 namespace uiWrappers {
-    export function wrapInTitle( ui: any, template: string ): any {
+    export function wrapInTitle( ui: any, template: string, buttons?: any[] ): any {
+        const btns = buttons === undefined ? [] : buttons,
+        cols = [
+            {
+                view: "label",
+                label: template
+            }
+        ].concat( btns );
+        
         return {
             margin: 0,
             padding: 0,
@@ -9,13 +17,8 @@ namespace uiWrappers {
                     borderless: true,
                     height: 36,
                     padding: 0,
-                    cols: [
-                        {
-                            view: "template",
-                            template: template,
-                            css: "headerbar",
-                        }
-                    ]
+                    cols: cols,
+                    css: "headerbar"
                 },
                 ui
             ]
