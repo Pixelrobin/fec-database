@@ -3,7 +3,7 @@
         "alwaysStrict": false,
         "module": "amd",
         "outFile": "app/app.js",
-        "target": "es5"
+        "target": "es6"
     },
     "exclude": [
         "node_modules"
