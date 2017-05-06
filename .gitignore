@@ -2,3 +2,4 @@
 node_modules
 app/app.js
 build
+npm-debug.log
