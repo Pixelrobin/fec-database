@@ -29,11 +29,9 @@ class TopView {
             css: "sidemenu",
             template:"<span class='webix_icon fa-#icon#'></span> #value# ",
             data:[
-                { value: "DashBoard",  id: "start", href: "#!/top/start", icon: "envelope-o" },
-                { value: "Home",       id: "home",  href: "#!/top/home",  icon: "briefcase"  },
-                { value: "Employees", id: "employees", href: "#!/top/employees"},
-                { value: "Schedules",  id: "schedules", href: "#!top/schedules"},
-                { value: "Attendence", id: "attendence", href: "#!top/attendence" }
+                { value: "Employees", id: "employees", href: "#!/top/employees", icon: "group" },
+                { value: "Schedules",  id: "schedules", href: "#!top/schedules", icon: "list" },
+                { value: "Attendence", id: "attendence", href: "#!top/attendence", icon: "check" }
             ]
         };
         

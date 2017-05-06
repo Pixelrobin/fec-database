@@ -1,3 +1,0 @@
-class test {
-    thing: string;
-}

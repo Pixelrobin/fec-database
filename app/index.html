@@ -10,6 +10,7 @@
 
 	<script>
 	window.nodeRequire = require;
+	window.ipcRenderer = require( 'electron' ).ipcRenderer;
 	delete window.require;
 	delete window.exports;
 	delete window.module;

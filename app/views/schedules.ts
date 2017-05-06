@@ -101,7 +101,7 @@ export = new class {
     }
 
     $ondestroy = () => {
-        this.scheduler.destroy();
+        //this.scheduler.destroy();
     }
 
     createScheduler(): void {

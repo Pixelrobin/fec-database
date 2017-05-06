@@ -2,20 +2,21 @@
   "name": "my-app",
   "version": "0.1.0",
   "description": "My App!",
-  "main": "main.js",
+  "main": "build/main.js",
   "scripts": {
     "build": "build.bat",
     "start": "electron ."
   },
   "keywords": [],
   "devDependencies": {
-    "electron": "^1.6.6"
-  },
-  "dependencies": {
+    "@types/sqlite3": "^2.2.33",
     "@types/electron": "^1.4.37",
     "@types/fullcalendar": "^2.7.42",
     "@types/node": "^7.0.18",
     "@types/webix": "^4.2.0",
+    "electron": "^1.6.6"
+  },
+  "dependencies": {
     "sqlite3": "^3.1.8"
   }
 }

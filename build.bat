@@ -1,3 +1,4 @@
+rmdir "build" /s /q
 call tsc
 cd app
 call tsc
