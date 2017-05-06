@@ -4,13 +4,10 @@
   "description": "My App!",
   "main": "main.js",
   "scripts": {
-    "build": "gulp build",
-    "build-pro": "gulp build --pro",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "build.bat",
+    "start": "electron ."
   },
-  "keywords": [
-    "webix"
-  ],
+  "keywords": [],
   "devDependencies": {
     "electron": "^1.6.6"
   },

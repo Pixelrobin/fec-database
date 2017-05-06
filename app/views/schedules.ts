@@ -72,7 +72,7 @@ export = new class {
         
         // Ignore these laters for now, they're lying
         if ( calendarElement.length <= 0 ) {
-            $$( "scheduler-webix" ).attachEvent( "onAfterRender", this.createScheduler );
+            ( $$( "scheduler-webix" ) as any ).attachEvent( "onAfterRender", this.createScheduler );
         } else this.createScheduler()
 
         /*$$( "addEvent" ).attachEvent( "onItemClick", () => {

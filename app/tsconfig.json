@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "alwaysStrict": false,
+        "module": "amd",
+        "outFile": "app.js",
+        "target": "es6"
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

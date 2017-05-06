@@ -1,11 +1,12 @@
 {
     "compilerOptions": {
-        "alwaysStrict": false,
-        "module": "amd",
-        "outFile": "app/app.js",
-        "target": "es6"
+        "target": "es5",
+        "module": "commonjs",
+        "sourceMap": true,
+        "outDir": "./build"
     },
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "app"
     ]
 }
