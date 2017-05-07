@@ -14,9 +14,11 @@ class TopView {
             elements: [
                 {
                     view: "template",
-                    template: "<h3>Lanes and Lasers<h3>",
+                    id: "mainHeader",
+                    template: "<h3>#name#<h3>",
                     css: "headerbar",
-                    padding: 0
+                    padding: 0,
+                    data: { name: "" }
                 }
             ]
         };
@@ -29,9 +31,10 @@ class TopView {
             css: "sidemenu",
             template:"<span class='webix_icon fa-#icon#'></span> #value# ",
             data:[
+                { value: "Attendance", id: "attendance", href: "#!top/attendance", icon: "check" },
                 { value: "Employees", id: "employees", href: "#!/top/employees", icon: "group" },
                 { value: "Schedules",  id: "schedules", href: "#!top/schedules", icon: "list" },
-                { value: "Attendence", id: "attendence", href: "#!top/attendence", icon: "check" }
+                { value: "Settings", id: "settings", href: "#!top/settings", icon: "gear" }
             ]
         };
         
@@ -46,6 +49,23 @@ class TopView {
 
         this.$ui = ui;
         this.$menu = "top:menu";
+    }
+
+    $oninit = () => {
+        ipcRenderer.on( "reset-business-name", ( event, arg ) => {
+            this.setBusinessName( arg );
+        })
+
+        ipcRenderer.send( "get-business-name" );
+    ipcRenderer.on( "get-business-name-reply", ( event, arg ) => {
+            this.setBusinessName( arg );
+        })
+    }
+
+    setBusinessName( name: string ): void {
+        let header = $$( "mainHeader" ) as webix.ui.template;
+
+        header.parse( { name: name }, "json" );
     }
 }
 

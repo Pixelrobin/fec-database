@@ -1,21 +1,9 @@
-class WeeklyEvent {
-	events: FC.EventObject[]
-	days: number[]
-	selectCallback: Function;
-
-	constructor( event: FC.EventObject, days: number[], selectCallback: Function ) {
-		this.selectCallback = selectCallback;
-	}
-
-	//eventClick = ( event: FC.EventObject )
-}
-
 class WeeklyScheduler implements FC.Options {
 	id: string;
 	defaultView = "agendaWeek";
 	header = false;
 	allDaySlot = false;
-	defaultDate = moment( new Date( 2000, 1, 1 ) );
+	defaultDate = new Date( 2006, 0, 1 );
 	editable = true;
 	eventBackgroundColor = "#3498db";
 	
@@ -41,8 +29,18 @@ class WeeklyScheduler implements FC.Options {
 		event.backgroundColor = "red";
 		this.eventSelection = event;
 		
-		this.sendEventCallback();
+		this.sendEventCallback( this.eventSelection );
 		this.$id().fullCalendar( "updateEvent", event );
+
+		console.log( this.eventSelection );
+	}
+
+	eventDrop = ( event: FC.EventObject ): void {
+		this.sendEventCallback( event, true );
+	}
+
+	eventResize = ( event: FC.EventObject ): void {
+		this.sendEventCallback( event, true );
 	}
 
 	// Class functions
@@ -51,9 +49,17 @@ class WeeklyScheduler implements FC.Options {
 		return $( this.id );
 	}
 
-	addEvent( event: FC.EventObject ): void {
+	addEvent( event: any ): void {
 		// Add an event
-		this.$id().fullCalendar( "renderEvent", event, true );
+		if ( !event.eventId ) event.eventId = this.generateId();
+		this.$id().fullCalendar( "renderEvent", event, false );
+		//this.$id().fullCalendar( "refresh" );
+	}
+
+	deleteEvent(): void {
+		if ( this.eventSelection ) {
+			this.$id().fullCalendar( "removeEvents", this.eventSelection.id );
+		}
 	}
 
 	submitChange( newEvent: FC.EventObject ): void {
@@ -61,21 +67,32 @@ class WeeklyScheduler implements FC.Options {
 		this.eventSelection.title = newEvent.title;
 		this.eventSelection.start = newEvent.start;
 		this.eventSelection.end   = newEvent.end;
+		this.eventSelection.id    = newEvent.id;
 
+		this.sendEventCallback( this.eventSelection, true );
 		this.$id().fullCalendar( "updateEvent", this.eventSelection );
 	}
 
-	sendEventCallback() {
+	sendEventCallback( event, skipForm?: boolean ) {
 		if ( this.eventDataCallback !== null ) {
-			this.eventSelectionId = this.generateId();
-			
+			skipForm = skipForm === undefined ? false : skipForm;
 			this.eventDataCallback( {
-				title: this.eventSelection.title,
-				start: this.eventSelection.start,
-				end: this.eventSelection.end,
-				checkId: this.eventSelectionId
-			} );
+				skipForm: skipForm,
+				event: {
+					eventId: (event as any).eventId,
+					title: event.title,
+					start: event.start,
+					end: event.end
+				}
+			});
 		}
+	}
+	
+	clear(): void {
+		this.$id().fullCalendar( "removeEvents" );
+		this.$id().fullCalendar( "removeEventSources" );
+		//this.$id().fullCalendar( "destroy" );
+		//this.$id().fullCalendar( this );
 	}
 
 	destroy(): void {
@@ -84,15 +101,17 @@ class WeeklyScheduler implements FC.Options {
 	}
 
 	private generateId(): string {
-		// Not a true guid, but good enough hopefully
+		// Not real guids but good enough
 		// http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
-		const s4 = () => {
+		function s4() {
 			return Math.floor((1 + Math.random()) * 0x10000)
 			.toString(16)
 			.substring(1);
 		}
-		return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+		return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+			s4() + '-' + s4() + s4() + s4();
 	}
+
 }
 
 export = WeeklyScheduler;

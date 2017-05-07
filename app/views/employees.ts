@@ -160,9 +160,11 @@ export = new class {
         const list = $$( "employeesList" ) as webix.ui.list;
         let selectedItem = list.getSelectedItem( false );
 
-        if ( selectedItem.id ) {
-            ipcRenderer.send( "delete-employee", selectedItem.id );
-            list.remove( list.getSelectedId( false ) as string );
+        if ( selectedItem ) {
+            if ( selectedItem.id ) {
+                ipcRenderer.send( "delete-employee", selectedItem.id );
+                list.remove( list.getSelectedId( false ) as string );
+            }
         }
     }
 }

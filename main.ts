@@ -6,6 +6,7 @@ import sqlite3 = require( 'sqlite3' );
 import EmployeesManager = require( "./managers/EmployeesManager" );
 import AttendanceManager = require( "./managers/AttendanceManager" );
 import SettingsManager = require( "./managers/SettingsManager" );
+import SchedulesManager = require( "./managers/SchedulesManager" )
 
 let main, db = new sqlite3.Database( "data.db" );
 
@@ -36,6 +37,7 @@ class ElectronMainWindow {
 EmployeesManager.init( db );
 AttendanceManager.init( db );
 SettingsManager.init( db );
+SchedulesManager.init( db );
 
 // Create window when ready
 app.on( "ready", () => {
