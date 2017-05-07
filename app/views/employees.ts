@@ -53,8 +53,8 @@ export = new class {
 
         this.$ui = uiWrappers.wrapInLayout( {
                 cols: [
-                    uiWrappers.wrapInTitle( list, "Employees", listButtons ),
-                    uiWrappers.wrapInTitle( form, "Information" )
+                    uiWrappers.wrapInTitle( "EmployeesTitle", list, "Employees", listButtons ),
+                    uiWrappers.wrapInTitle( "InformationTitle", form, "Information" )
                 ]
             }
         )

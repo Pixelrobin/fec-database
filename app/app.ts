@@ -8,10 +8,10 @@ import menu = require( "libs/webix-jet-core/plugins/menu" )
 //configuration
 var app = core.create({
     id:         "my-app",
-    name:       "My App!",
+    name:       "FEC Database",
     version:    "0.1.0",
     debug:      true,
-    start:      "/top/home"
+    start:      "/top/attendance"
 });
 
 app.use(menu);

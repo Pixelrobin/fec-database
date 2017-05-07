@@ -1,7 +1,7 @@
 {
   "name": "my-app",
   "version": "0.1.0",
-  "description": "My App!",
+  "description": "FEC Database",
   "main": "build/main.js",
   "scripts": {
     "build": "build.bat",

@@ -77,10 +77,10 @@ export = new class {
 
         this.$ui = uiWrappers.wrapInLayout( {
             cols: [
-                uiWrappers.wrapInTitle( businessSettings, "Business Settings", [
+                uiWrappers.wrapInTitle( "BuisinessTitle", businessSettings, "Business Settings", [
                     { view:"button", id:"businessSubmit", type: "form", align:"left", label: "Save", autowidth: true }
                 ] ),
-                uiWrappers.wrapInTitle( weekSettings, "Opening hours", [
+                uiWrappers.wrapInTitle( "HoursTitle", weekSettings, "Opening hours", [
                     { view:"button", id:"weekSubmit", type: "form", align:"left", label: "Save", autowidth: true }
                 ] ),
                 { view: "spacer" }

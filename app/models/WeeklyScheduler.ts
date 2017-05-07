@@ -6,6 +6,7 @@ class WeeklyScheduler implements FC.Options {
 	defaultDate = new Date( 2006, 0, 1 );
 	editable = true;
 	eventBackgroundColor = "#3498db";
+	height: "auto";
 	
 	columnFormat = "dddd";
 
@@ -16,7 +17,6 @@ class WeeklyScheduler implements FC.Options {
 
 	constructor( id: string ) {
 		this.id = "#" + id;
-		this.$id().fullCalendar( this ); // You Double agent this is on the job
 	}
 
 	// Object function properties
@@ -44,6 +44,10 @@ class WeeklyScheduler implements FC.Options {
 	}
 
 	// Class functions
+	init(): void {
+		this.$id().fullCalendar( this ); // You Double agent this is on the job
+	}
+
 	$id(): JQuery {
 		// Get JQuery object
 		return $( this.id );
@@ -52,12 +56,15 @@ class WeeklyScheduler implements FC.Options {
 	addEvent( event: any ): void {
 		// Add an event
 		if ( !event.eventId ) event.eventId = this.generateId();
+		event.id = this.generateId();
 		this.$id().fullCalendar( "renderEvent", event, false );
+		this.sendEventCallback( event, true );
 		//this.$id().fullCalendar( "refresh" );
 	}
 
 	deleteEvent(): void {
 		if ( this.eventSelection ) {
+			this.sendEventDestroyCallback( this.eventSelection );
 			this.$id().fullCalendar( "removeEvents", this.eventSelection.id );
 		}
 	}
@@ -67,10 +74,15 @@ class WeeklyScheduler implements FC.Options {
 		this.eventSelection.title = newEvent.title;
 		this.eventSelection.start = newEvent.start;
 		this.eventSelection.end   = newEvent.end;
-		this.eventSelection.id    = newEvent.id;
 
 		this.sendEventCallback( this.eventSelection, true );
 		this.$id().fullCalendar( "updateEvent", this.eventSelection );
+	}
+
+	sendEventDestroyCallback( event ) {
+		if ( this.eventDestroyCallback !== null ) {
+			this.eventDestroyCallback( (event as any).eventId );
+		}
 	}
 
 	sendEventCallback( event, skipForm?: boolean ) {

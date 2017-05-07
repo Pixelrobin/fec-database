@@ -102,6 +102,14 @@ export function init( database: sqlite3.Database ) {
                 );
             `, args, ( err ) => { if ( err ) console.log( err ) } )
         })
+    });
+
+    ipcMain.on( "delete-event", ( event, args ) => {
+        db.serialize( () => {
+            db.run( `
+                DELETE FROM scheduleData WHERE eventId = ?
+            `, args, ( err ) => { if ( err ) console.log( err ) } )
+        })
     })
 
 }

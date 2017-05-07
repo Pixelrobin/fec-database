@@ -1,5 +1,5 @@
 namespace uiWrappers {
-    export function wrapInTitle( ui: any, template: string, buttons?: any[] ): any {
+    export function wrapInTitle( id: string, ui: any, template: string, buttons?: any[] ): any {
         const btns = buttons === undefined ? [] : buttons,
         cols = [
             {
@@ -11,6 +11,7 @@ namespace uiWrappers {
         return {
             margin: 0,
             padding: 0,
+            id: id,
             rows: [
                 {
                     view: "toolbar",

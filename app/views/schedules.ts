@@ -5,10 +5,9 @@ import EventForm = require( "models/EventForm" );
 export = new class {
     $ui: any;
 
-    scheduler: WeeklyScheduler;
-    form: EventForm;
-    popupForm: EventForm;
-
+    scheduler: WeeklyScheduler = new WeeklyScheduler( "scheduler" );
+    form: EventForm = new EventForm( "SE" );
+    popupForm: EventForm = new EventForm( "SEP" );
     selectedItem: any = null;
 
     constructor() {
@@ -26,15 +25,12 @@ export = new class {
             columns: [
                 {
                     id:"name",
-                    header:[ {content:"textFilter"} ],
+                    header: "Name",//[ {content:"textFilter"} ],
                     width: 300
                 }
             ],
             data: []
         }
-        
-        this.form = new EventForm( "SE" ); // ScheduleEvent
-        this.popupForm = new EventForm( "SEP" ); // SchedueEventPopup
 
         const popup = {
             view: "popup",
@@ -67,21 +63,47 @@ export = new class {
                     {
                         margin: 10,
                         rows: [
-                            uiWrappers.wrapInTitle( {
+                            uiWrappers.wrapInTitle( "listTitle", {
                                 rows: [
                                     list,
                                     scheduleName
                                 ]
                             }, "Schedules", listButtons ),
-                            uiWrappers.wrapInTitle( this.form, "Event Editor" )
+                            uiWrappers.wrapInTitle( "EventEditorTitle", this.form, "Event Editor" )
                         ]
                     },
-                    uiWrappers.wrapInTitle( calendar, "Outlook", buttons )
+                    uiWrappers.wrapInTitle( "CalendarTitle", calendar, "Outlook", buttons )
                 ]
             }
         )
 
         webix.ui( popup );
+
+        this.popupForm.init( ( newEvent: FC.EventObject ) => {
+            this.scheduler.addEvent( newEvent );
+            this.popupForm.hide();
+        });
+
+        this.scheduler.eventDataCallback = ( data: any ) => {            
+            if ( !data.skipForm ) this.form.update( data.event );
+            
+            let event = {
+                $eventId: data.event.eventId,
+                $scheduleId: this.selectedItem.id,
+                $title: data.event.title,
+                $startTime: data.event.start.format( "HH:mm" ),
+                $endTime: data.event.end.format( "HH:mm" ),
+                $day: data.event.start.day()
+            }
+
+            console.log( "ready to pass ", event );
+
+            ipcRenderer.send( "submit-event", event );
+        }
+
+        this.scheduler.eventDestroyCallback = ( eventId: string) => {            
+            ipcRenderer.send( "delete-event", eventId );
+        }
 
     }
 
@@ -100,13 +122,13 @@ export = new class {
         } else this.createScheduler()
         
         addEventButton.attachEvent( "onItemClick", () => { this.popupForm.focus() } );
-        deleteEventButton.attachEvent( "onItemClick", () => { this.scheduler.deleteEvent() });
+        deleteEventButton.attachEvent( "onItemClick", () => { this.scheduler.deleteEvent(); });
         addScheduleButton.attachEvent( "onItemClick", () => { this.addSchedule() } );
         deleteScheduleButton.attachEvent( "onItemClick", () => { this.deleteSelectedSchedule() } );
 
         list.attachEvent( "onSelectChange", () => {
             this.updateFormValues( list.getSelectedItem( false ) );
-            console.log( list.getSelectedId( false ) );
+            
         });
 
         scheduleName.attachEvent( "onTimedKeyPress", () => {
@@ -116,11 +138,6 @@ export = new class {
         this.form.init( ( newEvent ) => {
             console.log( "sending to scheduler" );
             this.scheduler.submitChange( newEvent )
-        });
-
-        this.popupForm.init( ( newEvent: FC.EventObject ) => {
-            this.scheduler.addEvent( newEvent );
-            this.popupForm.hide();
         });
 
         this.popupForm.update( {
@@ -138,6 +155,7 @@ export = new class {
             this.parseEvents( arg );
         })
 
+        this.disable( true );
     }
 
     $ondestroy = () => {
@@ -174,28 +192,13 @@ export = new class {
     }
 
     createScheduler(): void {
-        this.scheduler = new WeeklyScheduler( "scheduler" );
-        this.scheduler.eventDataCallback = ( data: any ) => {            
-            if ( !data.skipForm ) this.form.update( data.event );
-            
-            let event = {
-                $eventId: data.event.eventId,
-                $scheduleId: this.selectedItem.id,
-                $title: data.event.title,
-                $startTime: data.event.start.format( "HH:mm" ),
-                $endTime: data.event.end.format( "HH:mm" ),
-                $day: data.event.start.day()
-            }
-
-            console.log( "ready to pass ", event );
-
-            ipcRenderer.send( "submit-event", event );
-        }
+        this.scheduler.init();
+        
 
         $$( "scheduler-webix" ).attachEvent( "onDestruct", () => {
             console.log( "DESTRUCTION TO SCHDULER");
             this.scheduler.destroy();
-            delete this.scheduler;
+            //delete this.scheduler;
         } )
     }
 
@@ -204,15 +207,19 @@ export = new class {
     }
 
     deleteSelectedSchedule(): void {
-        const list = $$( "scheduleList" ) as webix.ui.list;
+        const list = $$( "scheduleList" ) as webix.ui.datatable;
         let selectedItem = list.getSelectedItem( false );
 
         if ( selectedItem ) {
             if ( selectedItem.id ) {
                 ipcRenderer.send( "delete-schedule", selectedItem.id );
                 list.remove( list.getSelectedId( false ) as string );
+                this.scheduler.clear();
             }
         }
+
+        list.clearSelection();
+        list.refresh();
     }
 
     updateScheduleName(): void {
@@ -228,21 +235,33 @@ export = new class {
     }
 
     updateFormValues( obj: any ): void {
-        if ( !this.selectedItem || obj.id !== this.selectedItem.id ) {
-            if ( obj === undefined ) {
-                obj = { name: "" }
-                //$$( "employeeForm" ).disable()
-            } else {
-                //$$( "employeeForm" ).enable()
-            }
+        if ( obj ) {
+            if ( !this.selectedItem || obj.id !== this.selectedItem.id ) {
+                if ( obj === undefined ) {
+                    obj = { name: "" }
+                    this.disable( true );
+                } else {
+                    this.disable( false );
+                }
 
-            ( $$( "scheduleName" ) as webix.ui.text ).setValue( obj.name );
-            
-            if ( this.selectedItem ) this.scheduler.clear();
-            this.selectedItem = obj;
-            console.log( "UPDATE FORM VALUES");
-            ipcRenderer.send( "get-schedule-events", this.selectedItem.id );
-        }
+                ( $$( "scheduleName" ) as webix.ui.text ).setValue( obj.name );
+                
+                if ( this.selectedItem ) this.scheduler.clear();
+                this.selectedItem = obj;
+                console.log( "UPDATE FORM VALUES");
+                ipcRenderer.send( "get-schedule-events", this.selectedItem.id );
+            }
+        } else this.disable( true );
+    }
+
+    disable( disable: boolean ): void {
+        const things = [
+            $$( "EventEditorTitle" ), $$( "CalendarTitle" ), $$( "scheduleName" )
+        ]
+
+        if ( disable ) for ( let t of things ) t.disable();
+        else for ( let t of things ) t.enable();
+
     }
 
 }

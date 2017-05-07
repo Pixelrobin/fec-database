@@ -11,12 +11,15 @@ import SchedulesManager = require( "./managers/SchedulesManager" )
 let main, db = new sqlite3.Database( "data.db" );
 
 class ElectronMainWindow {
-    window: Electron.BrowserWindow
-    
+    window: Electron.BrowserWindow;
+    contents: Electron.WebContents;
+
     constructor( file: string ) {
         this.window = new BrowserWindow({
-            width: 800,
-            height: 600
+            minHeight: 720,
+            minWidth: 960,
+            width: 960,
+            height: 720
         })
 
         this.window.loadURL(url.format({
@@ -25,7 +28,14 @@ class ElectronMainWindow {
             slashes: true
         }))
 
-        this.window.webContents.openDevTools();
+        ipcMain.on( "print", ( event, arg ) => {
+            this.contents.print({})
+            event.sender.send( "print-reply" );
+        } )
+
+        this.contents = this.window.webContents;
+        //this.contents.openDevTools();
+        this.window.setMenu(null);
 
         this.window.on( "closed", () => {
             this.window = null
