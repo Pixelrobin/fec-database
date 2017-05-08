@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import path = require( 'path' );
 import url = require( 'url' );
 import sqlite3 = require( 'sqlite3' );
+import fs = require( 'fs' );
 
 import EmployeesManager = require( "./managers/EmployeesManager" );
 import AttendanceManager = require( "./managers/AttendanceManager" );
@@ -29,13 +30,21 @@ class ElectronMainWindow {
         }))
 
         ipcMain.on( "print", ( event, arg ) => {
-            this.contents.print({})
-            event.sender.send( "print-reply" );
+            //this.contents.print({})
+            //event.sender.send( "print-reply" );
+            this.window.webContents.printToPDF({}, (error, data) => {
+                if (error) throw error
+                fs.writeFile('C:/Users/pixel/Junk/PRINTOUTPUT/print.pdf', data, (error) => {
+                if (error) throw error
+
+            })
+            event.sender.send( "print-done" );
+            })
         } )
 
         this.contents = this.window.webContents;
-        //this.contents.openDevTools();
-        this.window.setMenu(null);
+        this.contents.openDevTools();
+        //this.window.setMenu(null);
 
         this.window.on( "closed", () => {
             this.window = null

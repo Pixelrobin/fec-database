@@ -39,13 +39,25 @@ export = new class {
 
     HoursInfoCard: InfoCard = new InfoCard( "HoursInfoCard", [
         { header: 1, value: "title", default: "No date selected" },
-        { header: 3, value: "desc", default: "Select a date to view it's data." },
+        { header: 3, value: "desc", default: "Select a date to view/edit its data." },
         { header: 5, value: "subtext", default: "" }
-    ], 150 )
+    ], 150 );
 
     GeneralInfoCard: InfoCard = new InfoCard( "GeneralInfoCard", [
         { header: 1, value: "title", default: "..." },
-    ], 150 )
+    ], 150 );
+
+    // Moved outside constructor to allow print() function to access
+    datatable: webix.ui.datatableConfig = {
+        view: "datatable",
+        id: "attendanceDatatable",
+        columns: [
+            { id: "hour", header: "Hour", autowidth: true },
+            { id: "visits", header: "Visits", autowidth: true, editor: "popup" }
+        ],
+        data: [],
+        editable: true
+    }
 
     constructor() {
         const calendar = {
@@ -66,17 +78,6 @@ export = new class {
                 ]}
 
             ]
-        }
-
-        const datatable: webix.ui.datatableConfig = {
-            view: "datatable",
-            id: "attendanceDatatable",
-            columns: [
-                { id: "hour", header: "Hour", autowidth: true },
-                { id: "visits", header: "Visits", autowidth: true, editor: "popup" }
-            ],
-            data: [],
-            editable: true
         }
 
         const chart: webix.ui.chartConfig = {
@@ -117,7 +118,7 @@ export = new class {
                     margin: 10,
                     rows: [
                         uiWrappers.wrapInTitle( "calendarTitle", calendar, "Calendar" ),
-                        uiWrappers.wrapInTitle( "datatableTitle", datatable, "Data" )
+                        uiWrappers.wrapInTitle( "datatableTitle", this.datatable, "Data", /*dataButtons*/ )
                     ]
                 },
                 {
@@ -300,7 +301,15 @@ export = new class {
     }
 
     print(): void {
-        let PrintWin = new PrinterWindow( "pw", "Customer Attendance Report", [] );
+        const datatable = this.datatable;
+        datatable.scroll = false;
+        datatable.data = this.data.day.visitsPerHour;
+        datatable.editable = false;
+
+        let test = [
+            this.datatable
+        ]
+        let PrintWin = new PrinterWindow( "pw", "Customer Attendance Report", test );
     }
 
     dateString( hour: number, minute?: number ): string {

@@ -20,7 +20,7 @@ class WeeklyScheduler implements FC.Options {
 	}
 
 	// Object function properties
-	eventClick = ( event: FC.EventObject, element: any ): void => {
+	eventClick = ( event: FC.EventObject, element: any ) => {
 		// change the border color just for fun
 		if ( this.eventSelection !== null ) {
 			this.eventSelection.backgroundColor = this.eventBackgroundColor;
@@ -35,11 +35,11 @@ class WeeklyScheduler implements FC.Options {
 		console.log( this.eventSelection );
 	}
 
-	eventDrop = ( event: FC.EventObject ): void {
+	eventDrop = ( event: FC.EventObject ) => {
 		this.sendEventCallback( event, true );
 	}
 
-	eventResize = ( event: FC.EventObject ): void {
+	eventResize = ( event: FC.EventObject ) => {
 		this.sendEventCallback( event, true );
 	}
 
@@ -53,12 +53,12 @@ class WeeklyScheduler implements FC.Options {
 		return $( this.id );
 	}
 
-	addEvent( event: any ): void {
+	addEvent( event: any, skipCallback?: boolean ): void {
 		// Add an event
 		if ( !event.eventId ) event.eventId = this.generateId();
 		event.id = this.generateId();
 		this.$id().fullCalendar( "renderEvent", event, false );
-		this.sendEventCallback( event, true );
+		if ( skipCallback !== true ) this.sendEventCallback( event, true );
 		//this.$id().fullCalendar( "refresh" );
 	}
 

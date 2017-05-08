@@ -4,26 +4,26 @@ class PrinterWindow {
     fullscreen: boolean = true;
     head: string;
     body: any;
-    css = "right";
     
     constructor( id: string, head: string, rows: any[] ) {
         this.id = id;
         this.head = head;
 
+        rows = [
+            {
+                view: "toolbar",
+                id: "printToolbar",
+                cols: [
+                    { view:"button", id:"printPrint", type: "form", value:"Print", align:"left", width: 100 },
+                    { view:"button", id:"printCancel", value:"Cancel", align:"left", width: 100 }
+                ]
+            }
+        ].concat( rows);
+
         this.body = {
             view: "layout",
-            rows: [
-                {
-                    view: "toolbar",
-                    id: "printToolbar",
-                    cols: [
-                        { view:"button", id:"printPrint", type: "form", value:"Print", align:"left", width: 100 },
-                        { view:"button", id:"printCancel", value:"Cancel", align:"left", width: 100 }
-                    ]
-                }
-            ]
+            rows: rows
         }
-
         webix.ui( this );
         
         let win    = $$( id ) as webix.ui.window,
@@ -37,7 +37,7 @@ class PrinterWindow {
         print.attachEvent( "onItemClick", () => {
             tools.hide();
             ipcRenderer.send( "print" );
-            ipcRenderer.once( "print-reply", ( e, a ) => { win.close() } )
+            ipcRenderer.once( "print-done", ( e, a ) => { win.close() } )
         })
 
         cancel.attachEvent( "onItemClick", () => {

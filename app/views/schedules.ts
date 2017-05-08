@@ -180,12 +180,13 @@ export = new class {
         console.log( "eventdata", data )
         
         for ( let e of data ) {
+            console.log( e.eventId );
             this.scheduler.addEvent({
                 title: e.title,
                 eventId: e.eventId,
                 start: c( e.startTime ).day( e.day ),
                 end: c( e.endTime ).day( e.day )
-            })
+            }, true );
         }
 
         //this.scheduler.addEventSource( events );
@@ -213,7 +214,8 @@ export = new class {
         if ( selectedItem ) {
             if ( selectedItem.id ) {
                 ipcRenderer.send( "delete-schedule", selectedItem.id );
-                list.remove( list.getSelectedId( false ) as string );
+                list.remove( list.getSelectedId( false, true ) as string );
+                this.selectedItem = null;
                 this.scheduler.clear();
             }
         }
@@ -235,20 +237,19 @@ export = new class {
     }
 
     updateFormValues( obj: any ): void {
+        console.log( obj );
         if ( obj ) {
             if ( !this.selectedItem || obj.id !== this.selectedItem.id ) {
-                if ( obj === undefined ) {
-                    obj = { name: "" }
-                    this.disable( true );
-                } else {
+                if ( obj ) {
+                    //obj = { name: "" }
                     this.disable( false );
+                    ( $$( "scheduleName" ) as webix.ui.text ).setValue( obj.name );
+                } else {
+                    this.disable( true );
                 }
 
-                ( $$( "scheduleName" ) as webix.ui.text ).setValue( obj.name );
-                
                 if ( this.selectedItem ) this.scheduler.clear();
                 this.selectedItem = obj;
-                console.log( "UPDATE FORM VALUES");
                 ipcRenderer.send( "get-schedule-events", this.selectedItem.id );
             }
         } else this.disable( true );

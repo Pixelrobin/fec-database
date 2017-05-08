@@ -93,6 +93,7 @@ export function init( database: sqlite3.Database ) {
     });*/
 
     ipcMain.on( "submit-event", ( event, args ) => {
+        console.log( "submitting event ", args.$eventId );
         db.serialize( () => {
             db.run( `
                 INSERT OR REPLACE INTO scheduleData(

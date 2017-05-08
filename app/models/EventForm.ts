@@ -96,9 +96,10 @@ class EventForm implements webix.ui.formConfig {
         if ( validated === true ) {
             this.event.title = this.formInputs.name.getValue()
             this.event.start = this.webixStringToMoment(
-                this.formInputs.start.getValue() ).day( ( this.formInputs.day.getValue() as any ) - 1 )
+                this.formInputs.start.getValue() ).day( ( this.formInputs.day.getValue() as any ) - 1 );
             this.event.end = this.webixStringToMoment(
-                this.formInputs.end.getValue() ).day( ( this.formInputs.day.getValue() as any ) - 1 )
+                this.formInputs.end.getValue() ).day( ( this.formInputs.day.getValue() as any ) - 1 );
+            ( this.event as any ).eventId = null;
 
             console.log( this.event );
             if ( this.eventChangeCallback !== null ) {

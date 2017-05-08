@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<link type="text/css" rel="stylesheet" href="libs/webix/codebase/skins/compact.css">
+	<link type="text/css" rel="stylesheet" href="assets/app.css">
+
+	<script>
+	window.nodeRequire = require;
+	window.ipcRenderer = require( 'electron' ).ipcRenderer;
+	delete window.require;
+	delete window.exports;
+	delete window.module;
+	</script>
+
+	<!-- Webix Library -->
+	<script type="text/javascript" src="libs/webix/codebase/webix.js"></script>
+    <script type="text/javascript" src="views/printer.js"></script>
+
+</head>
+<body></body>
+</html>
