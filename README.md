@@ -1,5 +1,5 @@
 # fec-database
-Program for managing employees, schedules and customer attendance records. Created for the FBLA 2017 Coding and Programming competition.
+Program for managing employees, schedules and customer attendance records for a mock family entertainment center business.
 
 ## Overview
 - Written in [Typescript](https://www.typescriptlang.org/) and [SQLite](https://www.sqlite.org/)
