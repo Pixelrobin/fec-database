@@ -1,3 +1,11 @@
+/*
+
+    THIS IS NOT COMPLETED TO A WORKING STATE
+    IT IS NOT IN THE FINAL PROGRAM
+
+*/
+
+
 class PrinterWindow {
     view: string = "window";
     id: string;

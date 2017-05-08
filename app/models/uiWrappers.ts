@@ -1,4 +1,7 @@
+// UI Wrappers for common webix element configurations
+
 namespace uiWrappers {
+    // Wrap an element in a window-like appearance with a titlebar
     export function wrapInTitle( id: string, ui: any, template: string, buttons?: any[] ): any {
         const btns = buttons === undefined ? [] : buttons,
         cols = [
@@ -26,11 +29,13 @@ namespace uiWrappers {
         }
     }
 
+    // Layout wrapper ontions interface
     interface layoutWrapper {
         rows?: any[],
         cols?: any[]
     }
 
+    // Wrap elements into a layout configuration
     export function wrapInLayout( ui: layoutWrapper ): any {
         let lui = ui as any;
         

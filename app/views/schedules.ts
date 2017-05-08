@@ -1,22 +1,34 @@
+// Main schedules view
+
 import uiWrappers = require( "models/uiWrappers" );
 import WeeklyScheduler = require( "models/WeeklyScheduler" );
 import EventForm = require( "models/EventForm" );
 
 export = new class {
-    $ui: any;
+    $ui: any; // Webix jet ui
 
+    // FullCalendar scheduler (see 'models/WeeklyScheduler')
     scheduler: WeeklyScheduler = new WeeklyScheduler( "scheduler" );
-    form: EventForm = new EventForm( "SE" );
-    popupForm: EventForm = new EventForm( "SEP" );
-    selectedItem: any = null;
+    
+    // Webix form for setting event data (see 'models/WeeklyScheduler')
+    // Used twice, so its it's own class
+    form: EventForm = new EventForm( "SE" ); // Form for editing currently selected event
+    popupForm: EventForm = new EventForm( "SEP" ); // Form for 'Add' popup
+    
+    selectedItem: any = null; // Currently selected item
 
     constructor() {
-        const calendar: webix.ui.templateConfig = {
+        // Scheduler ui
+        const scheduler: webix.ui.templateConfig = {
             view: "template",
             template: "<div id='scheduler'></div>",
             id: "scheduler-webix"
         }
 
+        // list for selecting schedule
+        // Disabled search because of conflicts with selction
+        // Also because of bad user expirience
+        // Basically, searching deselects the item in list
         const list: webix.ui.datatableConfig = {
             view:"datatable",
             id: "scheduleList",
@@ -32,6 +44,7 @@ export = new class {
             data: []
         }
 
+        // Popup for adding an event
         const popup = {
             view: "popup",
             id: "popupEventForm",
@@ -40,16 +53,19 @@ export = new class {
             body: this.popupForm
         }
 
+        // 'Add Event' and 'Delete Event' buttons
         const buttons = [
             { view:"button", id:"addEvent", type: "form", align:"left", label: "Add Event", autowidth: true, popup: "popupEventForm" },
             { view:"button", id:"deleteEvent", type: "danger", align:"left", label: "Delete Event", autowidth: true }
         ]
 
+        // 'Add' and 'Delete' Schedule buttons
         const listButtons = [
             { view:"button", id:"addSchedule", type: "form", align:"left", label: "Add", autowidth: true },
             { view:"button", id:"deleteSchedule", type: "danger", align:"left", label: "Delete", autowidth: true }
         ]
 
+        // Schedule name editor form
         const scheduleName = {
             view: "text",
             id: "scheduleName",
@@ -72,18 +88,26 @@ export = new class {
                             uiWrappers.wrapInTitle( "EventEditorTitle", this.form, "Event Editor" )
                         ]
                     },
-                    uiWrappers.wrapInTitle( "CalendarTitle", calendar, "Outlook", buttons )
+                    uiWrappers.wrapInTitle( "CalendarTitle", scheduler, "Outlook", buttons )
                 ]
             }
         )
 
         webix.ui( popup );
 
+        // Form submit callbacks
         this.popupForm.init( ( newEvent: FC.EventObject ) => {
             this.scheduler.addEvent( newEvent );
             this.popupForm.hide();
         });
 
+        this.form.init( ( newEvent ) => {
+            console.log( "sending to scheduler" );
+            this.scheduler.submitChange( newEvent )
+        });
+
+
+        // Scheduler callbacks
         this.scheduler.eventDataCallback = ( data: any ) => {            
             if ( !data.skipForm ) this.form.update( data.event );
             
@@ -107,20 +131,23 @@ export = new class {
 
     }
 
+    // Webix init event
     $oninit = () => {
-        const calendarElement = $( "#scheduler" ),
-            addEventButton = $$( "addEvent" ) as webix.ui.button,
-            deleteEventButton = $$( "deleteEvent" ) as webix.ui.button,
-            addScheduleButton = $$( "addSchedule" ) as webix.ui.button,
+        const calendarElement    = $( "#scheduler" ),
+            addEventButton       = $$( "addEvent" ) as webix.ui.button,
+            deleteEventButton    = $$( "deleteEvent" ) as webix.ui.button,
+            addScheduleButton    = $$( "addSchedule" ) as webix.ui.button,
             deleteScheduleButton = $$( "deleteSchedule" ) as webix.ui.button,
-            scheduleName = $$( "scheduleName" ) as webix.ui.text,
-            list = $$( "scheduleList" ) as webix.ui.list;
+            scheduleName         = $$( "scheduleName" ) as webix.ui.text,
+            list                 = $$( "scheduleList" ) as webix.ui.list;
         
-        // Ignore these laters for now, they're lying
+        // Render the scheduler (FullCalendar) component
+        // But check if the element exists yet
         if ( calendarElement.length <= 0 ) {
             ( $$( "scheduler-webix" ) as any ).attachEvent( "onAfterRender", () => { this.createScheduler() } );
         } else this.createScheduler()
         
+        // Events
         addEventButton.attachEvent( "onItemClick", () => { this.popupForm.focus() } );
         deleteEventButton.attachEvent( "onItemClick", () => { this.scheduler.deleteEvent(); });
         addScheduleButton.attachEvent( "onItemClick", () => { this.addSchedule() } );
@@ -135,17 +162,14 @@ export = new class {
             this.updateScheduleName()
         })
 
-        this.form.init( ( newEvent ) => {
-            console.log( "sending to scheduler" );
-            this.scheduler.submitChange( newEvent )
-        });
-
         this.popupForm.update( {
             title: "",
             start: moment( new Date( 2006, 0, 1, 10 ) ),
             end: moment( new Date( 2006, 0, 1, 11 ) )
         } as FC.EventObject )
 
+
+        // ipc Events
         ipcRenderer.send( "get-schedule-names" );
         ipcRenderer.on( "get-schedule-names-reply", ( event, arg ) => {
             this.parseData( arg );
@@ -155,32 +179,34 @@ export = new class {
             this.parseEvents( arg );
         })
 
+        // Disabled by default (no schedule sected at start)
         this.disable( true );
     }
 
+    // Webix destroy event
     $ondestroy = () => {
-        //this.scheduler.destroy();
-        //$$( "popupEventForm" ).destructor();
+        // Remove ipc listeners to avoid repeats
+        // Because of interaction with other classes
         ipcRenderer.removeAllListeners( "get-schedule-names-reply" );
         ipcRenderer.removeAllListeners( "get-schedule-events-reply" );
         this.selectedItem = null;
     }
 
+    // Parse data (schedule names only)
     parseData( data: any ): void {
         let list = $$( "scheduleList" ) as webix.ui.list;
-        console.log( "parsing data" );
 
         list.parse( data, "json" )
     }
 
+    // Parse events in schedule
     parseEvents( data: any[] ): void {
-        let c = (d) => { return moment( d + ":2006:01:01", "HH:mm:YYYY:MM:DD" ) };
-        let events = []
-
-        console.log( "eventdata", data )
+        let c = (d) => { return moment( d + ":2006:01:01", "HH:mm:YYYY:MM:DD" ) },
+        events = []
         
+        // Add event via 'this.scheduler'
+        // Second argument 'true' to avoid data update callback
         for ( let e of data ) {
-            console.log( e.eventId );
             this.scheduler.addEvent({
                 title: e.title,
                 eventId: e.eventId,
@@ -188,34 +214,31 @@ export = new class {
                 end: c( e.endTime ).day( e.day )
             }, true );
         }
-
-        //this.scheduler.addEventSource( events );
     }
 
+    // Create scheduler component
     createScheduler(): void {
         this.scheduler.init();
-        
-
-        $$( "scheduler-webix" ).attachEvent( "onDestruct", () => {
-            console.log( "DESTRUCTION TO SCHDULER");
+        ( $$( "scheduler-webix" ) as any ).attachEvent( "onDestruct", () => {
             this.scheduler.destroy();
-            //delete this.scheduler;
         } )
     }
 
+    // Add schedule to database
     addSchedule(): void {
         ipcRenderer.send( "add-schedule", "New Schedule" );
     }
 
+    // Delete currently selected schedule and notify database
     deleteSelectedSchedule(): void {
-        const list = $$( "scheduleList" ) as webix.ui.datatable;
-        let selectedItem = list.getSelectedItem( false );
+        const list = $$( "scheduleList" ) as webix.ui.datatable,
+            selectedItem = list.getSelectedItem( false );
 
         if ( selectedItem ) {
             if ( selectedItem.id ) {
                 ipcRenderer.send( "delete-schedule", selectedItem.id );
                 list.remove( list.getSelectedId( false, true ) as string );
-                this.selectedItem = null;
+                this.selectedItem = null; // To avoid errors
                 this.scheduler.clear();
             }
         }
@@ -224,10 +247,11 @@ export = new class {
         list.refresh();
     }
 
+    // Update schedule name in database
     updateScheduleName(): void {
         let id = this.selectedItem.id;
-        console.log( "update name");
         
+        // Update 'this.selectedItem' too
         this.selectedItem = {
             id: id,
             name: ( $$( "scheduleName" ) as webix.ui.text ).getValue(),
@@ -236,25 +260,27 @@ export = new class {
         ipcRenderer.send( "set-schedule-name", this.selectedItem );
     }
 
+    // Update schedule name textbox and disable ui if needed
+    // Also, get the events for a particular schedule from the database
     updateFormValues( obj: any ): void {
         console.log( obj );
         if ( obj ) {
             if ( !this.selectedItem || obj.id !== this.selectedItem.id ) {
                 if ( obj ) {
-                    //obj = { name: "" }
                     this.disable( false );
                     ( $$( "scheduleName" ) as webix.ui.text ).setValue( obj.name );
-                } else {
-                    this.disable( true );
-                }
+                } else this.disable( true );
 
                 if ( this.selectedItem ) this.scheduler.clear();
                 this.selectedItem = obj;
+
+                // Get events from database
                 ipcRenderer.send( "get-schedule-events", this.selectedItem.id );
             }
         } else this.disable( true );
     }
 
+    // Disable or enable editor parts of the ui
     disable( disable: boolean ): void {
         const things = [
             $$( "EventEditorTitle" ), $$( "CalendarTitle" ), $$( "scheduleName" )

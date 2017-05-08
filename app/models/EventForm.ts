@@ -1,3 +1,7 @@
+// Event data setting form for scheduler
+// TODO: Add support for repeating events
+
+// Form input interface
 interface EventFormInputs {
     name:   webix.ui.text,
     start:  webix.ui.datepicker,
@@ -8,19 +12,22 @@ interface EventFormInputs {
 }
 
 class EventForm implements webix.ui.formConfig {
+    // Webix component configs
     view = "form";
     autoheight = false;
     elements = null;
-    
-    id: string; // TODO: Change to formId
+    id: string;
     formInputs: EventFormInputs;
 
-    event: FC.EventObject;
-    eventChangeCallback: Function = null;
+    event: FC.EventObject; // Event to edit
+    eventChangeCallback: Function = null; // Callback on event submit
 
+    // Used to stop events from submitting themselves
+    // to the database when being loaded from it.
     skipChanges: boolean = false;
 
     constructor( id: string ) {
+        // Form elements
         this.elements = [
             { view: "text", id: id + "Name", placeholder: "Event Name", label: "Event Name", labelPosition: "top"  },
             { cols: [
@@ -57,7 +64,9 @@ class EventForm implements webix.ui.formConfig {
         this.id = id;
     }
 
+    // Initiate the form
     init( eventChangeCallback: Function ): void {
+        // Fill 'this.FormInputs' with components
         this.formInputs = {
             name:   ( $$( this.id + "Name"   ) as webix.ui.text       ),
             start:  ( $$( this.id + "Start"  ) as webix.ui.datepicker ),
@@ -67,11 +76,13 @@ class EventForm implements webix.ui.formConfig {
             cancel: ( $$( this.id + "cancel" ) as webix.ui.button     )
         }
 
+        // 'Submit' button press event
         this.formInputs.submit.attachEvent( "onItemClick", () => { this.submitChanges() } )
         
         this.eventChangeCallback = eventChangeCallback;
     }
 
+    // Update the form with new event data
     update( newEvent: FC.EventObject ) {
         this.event = newEvent;
         this.skipChanges = true;
@@ -80,25 +91,31 @@ class EventForm implements webix.ui.formConfig {
         this.formInputs.end.setValue( this.momentToWebixString( newEvent.end ) );
         this.formInputs.day.setValue( newEvent.start.day() + 1 );
         this.skipChanges = false;
-        console.log( newEvent.start.day() );
     }
 
+    // Submit the changes in the form via the callback function
     submitChanges(): void {
         const validated = (
-            this.webixStringToMoment( $$( this.id + "End" ).getValue() )
-            .isAfter( this.webixStringToMoment( $$( this.id + "Start" ).getValue() ) )
+            this.webixStringToMoment(
+                ( $$( this.id + "End" ) as any ).getValue()
+            )
+            
+            .isAfter( this.webixStringToMoment(
+                ( $$( this.id + "Start" ) as any ).getValue() )
+            )
         )
-
-        console.log( "validation: ", validated );
-        console.log( $$( this.id + "End" ).getValue() );
-        console.log( $$( this.id + "Start" ).getValue() );
 
         if ( validated === true ) {
             this.event.title = this.formInputs.name.getValue()
+            
             this.event.start = this.webixStringToMoment(
-                this.formInputs.start.getValue() ).day( ( this.formInputs.day.getValue() as any ) - 1 );
+                this.formInputs.start.getValue() ).day( ( this.formInputs.day.getValue() as any ) - 1
+            );
+            
             this.event.end = this.webixStringToMoment(
-                this.formInputs.end.getValue() ).day( ( this.formInputs.day.getValue() as any ) - 1 );
+                this.formInputs.end.getValue() ).day( ( this.formInputs.day.getValue() as any ) - 1
+            );
+            
             ( this.event as any ).eventId = null;
 
             console.log( this.event );
@@ -120,18 +137,22 @@ class EventForm implements webix.ui.formConfig {
         }
     }*/
 
+    // Convert webix time element return string to 'moment'
     webixStringToMoment( date: string ): any {
         return moment( date + ":2006:01:01", "HH:mm:YYYY:MM:DD" );
     }
 
+    // Convert moment to webix time element string
     momentToWebixString( date: any ): string {
         return date.format( "HH:mm" )
     }
 
+    // Hide the form
     hide(): void {
         $$( this.id ).hide();
     }
 
+    // Focus on the name element
     focus(): void {
         ( $$( this.id + "Name" ) as webix.ui.text) .focus();
     }

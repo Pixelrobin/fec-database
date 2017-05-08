@@ -1,12 +1,15 @@
+// Main employee view
+
 import uiWrappers = require( "models/uiWrappers" );
 
 export = new class {
-    $ui: any;
-    selectedItem: any;
-    data: any[] = [];
+    $ui: any; // webix jet ui
+    selectedItem: any; // Currently selected employee
+    data: any[] = []; // Employee data
     
     constructor() {
 
+        // Employee list
         const list = {
             view:"datatable",
             id: "employeesList",
@@ -27,6 +30,7 @@ export = new class {
             data: []
         }
 
+        // Employee editor form
         const form: webix.ui.formConfig = {
             view: "form",
             id: "employeeForm",
@@ -37,15 +41,10 @@ export = new class {
                 { view: "text", id: "employeeEmail", label: "Email", keyPressTimeout: 500, labelWidth: 100 },
                 { view: "text", id: "employeePhone", label: "Phone", keyPressTimeout: 500, labelWidth: 100 },
                 { view: "textarea", id: "employeeComments", label: "Comments", keyPressTimeout: 500, labelWidth: 100 },
-                /*{
-                    cols: [
-                        { view:"button", id: "employeeSave", value:"Save", type: "form" },
-                        { view:"button", id: "employeeCancel", value:"Cancel" }
-                    ]
-                }*/
             ]
         }
 
+        // Add/delete buttons
         const listButtons = [
             { view:"button", id:"employeesAdd", type: "form", align:"left", label: "Add", autowidth: true },
             { view:"button", id:"employeesDelete", type: "danger", align:"left", label: "Delete", autowidth: true }
@@ -60,6 +59,7 @@ export = new class {
         )
     }
 
+    // Webix jet init event
     $oninit = () => {
         const list = $$( "employeesList"   ) as webix.ui.list,
             add    = $$( "employeesAdd"    ) as webix.ui.button,
@@ -69,34 +69,39 @@ export = new class {
                 "employeeName", "employeeCategory",
                 "employeeEmail", "employeePhone", "employeeComments"
             ];
-        
-        ipcRenderer.on( "employee-list-reply", ( event, arg ) => {
-            this.parseReply( arg );
-        } )
 
-        list.attachEvent( "onSelectChange", () => {
-            this.updateFormValues( list.getSelectedItem( false ) );
-            console.log( list.getSelectedId( false ) );
-        });
-
-        //save.attachEvent( "onItemClick", () => { this.saveFormValues() } );
+        // Events
         add.attachEvent( "onItemClick", () => { this.requestNewEmployee() } )
         del.attachEvent( "onItemClick", () => { this.deleteSelectedEmployee() } )
+        list.attachEvent( "onSelectChange", () => {
+            this.updateFormValues( list.getSelectedItem( false ) );
+        });
+
+        // Add an 'onTimedKeyPress' event to all form inputs
+        // For autosaving data
         for ( let t of texts ) {
             ( $$( t ) as webix.ui.text ).attachEvent( "onTimedKeyPress", () => {
-                console.log( "Saving from " + t );
                 this.saveFormValues();
             } );
         }
 
+        // ipc Events
         ipcRenderer.send( "get-employee-list" );
+        ipcRenderer.on( "employee-list-reply", ( event, arg ) => {
+            this.parseData( arg );
+        } )
+
+        // Update inital values
+        // Undefined because no employee is selcted by default
         this.updateFormValues( undefined );
     }
 
-    parseReply( reply: any ) {
+    // Parse data recieved from database and update ui
+    parseData( reply: any ): void {
         let list = $$( "employeesList" ) as webix.ui.list;
 
         if ( reply.id ) {
+            // If data is for one entry only, update that
             let found = false;
             
             for ( let e = 0; e < this.data.length; e ++ ) {
@@ -108,24 +113,23 @@ export = new class {
             }
 
             if ( !found ) this.data.push( reply.rows[ 0 ] );
-        } else {
-            console.log( "updating all" );
-            this.data = reply.rows;
-        }
+        } else this.data = reply.rows; // Else update everything
         
-        console.log( this.data );
+        // Submit data to list
+        // Todo, submit one piece of data if an id is given
         list.parse( this.data, "json" );
         list.refresh();
     }
 
+    // Update the form with new values
     updateFormValues( obj: any ): void {
         if ( obj === undefined ) {
+            // Set defaults and disable form
             obj = { name: "", category: "", email: "", phone: "", comments: "" }
             $$( "employeeForm" ).disable()
-        } else {
-            $$( "employeeForm" ).enable()
-        }
+        } else $$( "employeeForm" ).enable(); // Enable form
 
+        // Insert values into form ui elements
         ( $$( "employeeName" ) as webix.ui.text ).setValue( obj.name );
         ( $$( "employeeCategory" ) as webix.ui.text ).setValue( obj.category );
         ( $$( "employeeEmail" ) as webix.ui.text ).setValue( obj.email );
@@ -135,9 +139,11 @@ export = new class {
         this.selectedItem = obj;
     }
 
+    // Save the form values to database
     saveFormValues(): void {
         let id = this.selectedItem.id;
         
+        // Get form values and update the selected item
         this.selectedItem = {
             id: id,
             name: ( $$( "employeeName" ) as webix.ui.text ).getValue(),
@@ -147,15 +153,18 @@ export = new class {
             comments: ( $$( "employeeComments" ) as webix.ui.textarea ).getValue()
         }
         
+        // Submit values
         ipcRenderer.send( "set-employee-data", this.selectedItem );
     }
 
+    // Ask database to make a new employee
     requestNewEmployee(): void {
         ipcRenderer.send( "add-employee", {
             name: "New Employee"
         } );
     }
 
+    // Delete currently selected employee and remove them from database
     deleteSelectedEmployee() {
         const list = $$( "employeesList" ) as webix.ui.list;
         let selectedItem = list.getSelectedItem( false );

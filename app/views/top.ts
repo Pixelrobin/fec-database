@@ -1,11 +1,19 @@
+// Main view with the titlebar and menu
+// TODO: edit list css to make it look more attractive
+
 import app = require( "app" );
 
-class TopView {
-    $ui: any;
+export = new class {
+    $ui: any; // Webix jet ui
+    
+    // Used for webix jet
+    // Not 100% sure what this does
     $menu: string;
 
     constructor() {
-        var header = {
+
+        // Header element
+        var header: webix.ui.toolbarConfig = {
             view: "toolbar",
             type: "header",
             height: 56,
@@ -23,10 +31,10 @@ class TopView {
             ]
         };
 
-        var menu = {
+        // Side menu element
+        var menu: webix.ui.menuConfig = {
             view:"menu", id:"top:menu", 
             width:180, layout:"y", select:true,
-            padding: 0,
             scroll: false,
             css: "sidemenu",
             template:"<span class='webix_icon fa-#icon#'></span> #value# ",
@@ -37,8 +45,8 @@ class TopView {
                 { value: "Settings", id: "settings", href: "#!top/settings", icon: "gear" }
             ]
         };
-        
-        var ui = {
+
+        this.$ui = {
             rows: [
                 header,
                 {
@@ -46,12 +54,12 @@ class TopView {
                 }
             ]
         };
-
-        this.$ui = ui;
         this.$menu = "top:menu";
     }
 
+    // Webix init event
     $oninit = () => {
+        // Listen for a change in the business name setting
         ipcRenderer.on( "reset-business-name", ( event, arg ) => {
             this.setBusinessName( arg );
         })
@@ -62,11 +70,10 @@ class TopView {
         })
     }
 
+    // Set business name on header
     setBusinessName( name: string ): void {
         let header = $$( "mainHeader" ) as webix.ui.template;
 
         header.parse( { name: name }, "json" );
     }
 }
-
-export = new TopView();
