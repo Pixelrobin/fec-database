@@ -1,6 +1,4 @@
-/*
-	App configuration
-*/
+// App configuration
 
 import core = require( "libs/webix-jet-core/core" )
 import menu = require( "libs/webix-jet-core/plugins/menu" )

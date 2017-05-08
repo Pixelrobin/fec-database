@@ -1,3 +1,5 @@
+// Data manager for attendance
+
 import { ipcMain } from 'electron'
 import sqlite3 = require( "sqlite3" );
 
@@ -6,6 +8,7 @@ let db: sqlite3.Database;
 export function init( database: sqlite3.Database ) {
     db = database;
 
+    // Create SQLite table if it doesn't exist
     db.exec(
         `CREATE TABLE IF NOT EXISTS attendance (
             id     INTEGER PRIMARY KEY,
@@ -15,6 +18,7 @@ export function init( database: sqlite3.Database ) {
         );`
     )
 
+    // Get the attendace data
     ipcMain.on( "get-attendance-data", ( event, arg ) => {
         let result = {
             weekrows: null,
@@ -45,6 +49,7 @@ export function init( database: sqlite3.Database ) {
         });
     });
 
+    // Update attendance data
     ipcMain.on( "update-attendance-data", ( event, arg ) => {
         db.serialize( () => {
             for ( let d of arg.data ) {

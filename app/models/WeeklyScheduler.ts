@@ -1,4 +1,8 @@
+// Weekly Scheduler ui
+// Extends the FullCalendar object
+
 class WeeklyScheduler implements FC.Options {
+	// FullCalendar options
 	id: string;
 	defaultView = "agendaWeek";
 	header = false;
@@ -7,11 +11,13 @@ class WeeklyScheduler implements FC.Options {
 	editable = true;
 	eventBackgroundColor = "#3498db";
 	height: "auto";
-	
 	columnFormat = "dddd";
 
+	// Event Selections
 	eventSelection: FC.EventObject = null;
 	eventSelectionId: string = "";
+	
+	// Callbacks
 	eventDataCallback: Function = null;
 	eventDestroyCallback: Function = null;
 
@@ -20,8 +26,9 @@ class WeeklyScheduler implements FC.Options {
 	}
 
 	// Object function properties
+
+	// On event click
 	eventClick = ( event: FC.EventObject, element: any ) => {
-		// change the border color just for fun
 		if ( this.eventSelection !== null ) {
 			this.eventSelection.backgroundColor = this.eventBackgroundColor;
 		}
@@ -35,42 +42,54 @@ class WeeklyScheduler implements FC.Options {
 		console.log( this.eventSelection );
 	}
 
+	// On event dragged
 	eventDrop = ( event: FC.EventObject ) => {
 		this.sendEventCallback( event, true );
 	}
 
+	// On event resized
 	eventResize = ( event: FC.EventObject ) => {
 		this.sendEventCallback( event, true );
 	}
 
 	// Class functions
+
+	// Initiate the FullCalendar
 	init(): void {
 		this.$id().fullCalendar( this ); // You Double agent this is on the job
 	}
 
+	// Get the JQuery id of the calendar
 	$id(): JQuery {
-		// Get JQuery object
 		return $( this.id );
 	}
 
+	// Add an event to the calendar
 	addEvent( event: any, skipCallback?: boolean ): void {
-		// Add an event
+		// Give it an eventId if it doesn't have one
 		if ( !event.eventId ) event.eventId = this.generateId();
+		
+		// Set the id that FullCalendar uses
 		event.id = this.generateId();
+
+		// Render event
 		this.$id().fullCalendar( "renderEvent", event, false );
+		
+		// Callback if needed
 		if ( skipCallback !== true ) this.sendEventCallback( event, true );
-		//this.$id().fullCalendar( "refresh" );
 	}
 
+	// Delete an event
 	deleteEvent(): void {
+		// Make sure it exists first
 		if ( this.eventSelection ) {
 			this.sendEventDestroyCallback( this.eventSelection );
 			this.$id().fullCalendar( "removeEvents", this.eventSelection.id );
 		}
 	}
 
+	// Submit a change to an event
 	submitChange( newEvent: FC.EventObject ): void {
-		console.log( "getting new data" );
 		this.eventSelection.title = newEvent.title;
 		this.eventSelection.start = newEvent.start;
 		this.eventSelection.end   = newEvent.end;
@@ -79,13 +98,17 @@ class WeeklyScheduler implements FC.Options {
 		this.$id().fullCalendar( "updateEvent", this.eventSelection );
 	}
 
+	// Send callback for a destroyed event
 	sendEventDestroyCallback( event ) {
 		if ( this.eventDestroyCallback !== null ) {
 			this.eventDestroyCallback( (event as any).eventId );
 		}
 	}
 
+	// Send callback for a changed or added event
 	sendEventCallback( event, skipForm?: boolean ) {
+		// Use 'skipForm' to set whether to update the form
+		// (Used for 'views/schedules.ts' implementation)
 		if ( this.eventDataCallback !== null ) {
 			skipForm = skipForm === undefined ? false : skipForm;
 			this.eventDataCallback( {
@@ -100,18 +123,18 @@ class WeeklyScheduler implements FC.Options {
 		}
 	}
 	
+	// Clear all the calendar events
 	clear(): void {
 		this.$id().fullCalendar( "removeEvents" );
 		this.$id().fullCalendar( "removeEventSources" );
-		//this.$id().fullCalendar( "destroy" );
-		//this.$id().fullCalendar( this );
 	}
 
+	// Destroy scheduler
 	destroy(): void {
-		// Destroy scheduler
 		this.$id().fullCalendar( "destroy" );
 	}
 
+	// Generate a random string id
 	private generateId(): string {
 		// Not real guids but good enough
 		// http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript

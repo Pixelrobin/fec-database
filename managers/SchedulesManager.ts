@@ -1,3 +1,5 @@
+// Data manager for schedules
+
 import { ipcMain } from 'electron'
 import sqlite3 = require( "sqlite3" );
 
@@ -6,6 +8,7 @@ let db: sqlite3.Database;
 export function init( database: sqlite3.Database ) {
     db = database;
 
+    // Create tables if they don't exist
     db.exec(`
         CREATE TABLE IF NOT EXISTS schedules (
             name TEXT,
@@ -24,10 +27,12 @@ export function init( database: sqlite3.Database ) {
     `
     )
 
+    // Get a list of schedule names
     ipcMain.on( "get-schedule-names", ( event, arg ) => {
         returnScheduleNames( event );
     });
 
+    // Get events in a certain schedule
     ipcMain.on( "get-schedule-events", ( event, arg ) => {
         db.serialize( () => {
             db.all( `SELECT * FROM scheduleData WHERE scheduleId = ?`, arg, ( err, rows ) => {
@@ -36,6 +41,7 @@ export function init( database: sqlite3.Database ) {
         })
     });
 
+    // Add a new schedule
     ipcMain.on( "add-schedule", ( event, arg ) => {
         db.serialize( () => {
             db.run(
@@ -48,6 +54,7 @@ export function init( database: sqlite3.Database ) {
         });
     });
 
+    // Set a schedule's name
     ipcMain.on( "set-schedule-name", ( event, arg ) => {
         db.serialize( () => {
             db.run(
@@ -63,6 +70,7 @@ export function init( database: sqlite3.Database ) {
         } );
     } );
 
+    // Delete a schedule, including all it's events
     ipcMain.on( "delete-schedule", ( event, arg ) => {
         db.serialize( () => {
             db.run( `DELETE FROM scheduleData WHERE scheduleId = ?`, arg );
@@ -72,26 +80,7 @@ export function init( database: sqlite3.Database ) {
         })
     })
 
-    /*ipcMain.on( "create-event", ( event, arg ) => {
-        db.serialize( () => {
-            db.run( `INSERT INTO scheduleData( scheduleId ) VALUES( ? )`, arg.scheduleId );
-
-        })
-    })
-
-    ipcMain.on( "submit-event", ( event, arg ) => {
-        db.serialize( () => {
-            db.run( `
-                UPDATE scheduleData SET
-                    name = $name,
-                    startTime = $startTime,
-                    endTime = $endTime,
-                    day = $day
-                WHERE id = $id
-            `, arg)
-        })
-    });*/
-
+    // Create or update an event
     ipcMain.on( "submit-event", ( event, args ) => {
         console.log( "submitting event ", args.$eventId );
         db.serialize( () => {
@@ -105,6 +94,7 @@ export function init( database: sqlite3.Database ) {
         })
     });
 
+    // Delete an event
     ipcMain.on( "delete-event", ( event, args ) => {
         db.serialize( () => {
             db.run( `
@@ -115,6 +105,8 @@ export function init( database: sqlite3.Database ) {
 
 }
 
+// Return all the schedule names
+// Function because it's used mutiple times
 function returnScheduleNames( event: Electron.IpcMainEvent ) {
     db.serialize( () => {
         db.all( "SELECT * FROM schedules;", ( err, rows ) => {

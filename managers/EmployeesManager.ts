@@ -1,3 +1,5 @@
+// Data manager for employees
+
 import { ipcMain } from 'electron'
 import sqlite3 = require( "sqlite3" );
 
@@ -6,6 +8,7 @@ let db: sqlite3.Database;
 export function init( database: sqlite3.Database ) {
     db = database;
 
+    // Create table if it doesn't exist
     db.serialize( () => {
         db.exec(
             `CREATE TABLE IF NOT EXISTS employees (
@@ -19,10 +22,12 @@ export function init( database: sqlite3.Database ) {
         )
     } );
     
+    // Get list of employees
     ipcMain.on( "get-employee-list", ( event, arg ) => {
         returnEmployeeData( event );
     } );
 
+    // Set the data of an employee
     ipcMain.on( "set-employee-data", ( event, arg ) => {
         db.serialize( () => {
             db.run(
@@ -42,6 +47,7 @@ export function init( database: sqlite3.Database ) {
         } );
     } );
 
+    // Add a new employee
     ipcMain.on( "add-employee", ( event, arg ) => {
         db.serialize( () => {
             db.run(
@@ -55,6 +61,7 @@ export function init( database: sqlite3.Database ) {
         } )
     } );
 
+    // Delete an employee
     ipcMain.on( "delete-employee", ( event, arg ) => {
         db.serialize( () => {
             db.run( "DELETE FROM employees WHERE id = ?", arg, ( err ) => {
@@ -64,8 +71,11 @@ export function init( database: sqlite3.Database ) {
     } );
 }
 
+// Return employee data, wither the whole thing or just for one
+// Function because it is used multipl times
 function returnEmployeeData( event: Electron.IpcMainEvent, id?: number ) {
     let callback = ( err, rows ) => {
+        // Send the result back
         if ( !err ) event.sender.send( "employee-list-reply", {
             rows: rows,
             id: id === undefined ? null : id
@@ -73,6 +83,7 @@ function returnEmployeeData( event: Electron.IpcMainEvent, id?: number ) {
     }
     
     db.serialize( () => {
+        // If there is an id specified, get data only for that id
         if ( id === undefined ) db.all( "SELECT * FROM employees;", callback );
         else db.all( "SELECT * FROM employees WHERE id = ?;", id, callback );
     } )
