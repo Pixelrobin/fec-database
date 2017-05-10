@@ -8,7 +8,6 @@ interface EventFormInputs {
     end:    webix.ui.datepicker,
     day:    webix.ui.richselect,
     submit: webix.ui.button,
-    cancel: webix.ui.button
 }
 
 class EventForm implements webix.ui.formConfig {
@@ -64,8 +63,13 @@ class EventForm implements webix.ui.formConfig {
         this.id = id;
     }
 
-    // Initiate the form
+    // Initiate the form (just callback for now)
     init( eventChangeCallback: Function ): void {
+        this.eventChangeCallback = eventChangeCallback;
+    }
+
+    // Initiate the ui references (called once ui is loaded, unline init())
+    initUi(): void {
         // Fill 'this.FormInputs' with components
         this.formInputs = {
             name:   ( $$( this.id + "Name"   ) as webix.ui.text       ),
@@ -73,13 +77,10 @@ class EventForm implements webix.ui.formConfig {
             end:    ( $$( this.id + "End"    ) as webix.ui.datepicker ),
             day:    ( $$( this.id + "Day"    ) as webix.ui.richselect ),
             submit: ( $$( this.id + "Submit" ) as webix.ui.button     ),
-            cancel: ( $$( this.id + "cancel" ) as webix.ui.button     )
         }
 
-        // 'Submit' button press event
+        // 'Submit' button press events
         this.formInputs.submit.attachEvent( "onItemClick", () => { this.submitChanges() } )
-        
-        this.eventChangeCallback = eventChangeCallback;
     }
 
     // Update the form with new event data

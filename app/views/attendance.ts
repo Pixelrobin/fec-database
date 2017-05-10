@@ -120,7 +120,7 @@ export = new class {
                     margin: 10,
                     rows: [
                         uiWrappers.wrapInTitle( "calendarTitle", calendar, "Calendar" ),
-                        uiWrappers.wrapInTitle( "datatableTitle", this.datatable, "Data", /*dataButtons*/ )
+                        uiWrappers.wrapInTitle( "datatableTitle", this.datatable, "Data", dataButtons )
                     ]
                 },
                 {
@@ -146,7 +146,7 @@ export = new class {
             datatable = $$( "attendanceDatatable" ) as webix.ui.datatable,
             schedulePrint = $$( "schedulePrint" ) as webix.ui.button;
         
-        //schedulePrint.attachEvent( "onItemClick", () => { this.print() } );
+        schedulePrint.attachEvent( "onItemClick", () => { this.print() } );
 
         // Events
         calendar.attachEvent( "onDateSelect", ( date: Date ) => {

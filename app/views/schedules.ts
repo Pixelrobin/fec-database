@@ -162,6 +162,11 @@ export = new class {
             this.updateScheduleName()
         })
 
+        
+        // Initiate evet editor forms
+        this.form.initUi();
+        this.popupForm.initUi();
+
         this.popupForm.update( {
             title: "",
             start: moment( new Date( 2006, 0, 1, 10 ) ),

@@ -1,15 +1,18 @@
 // Main electron instance
-
-import { app, BrowserWindow, ipcMain } from 'electron'
+const { shell, app, BrowserWindow, ipcMain } = require( 'electron' );
 import path = require( 'path' );
 import url = require( 'url' );
 import sqlite3 = require( 'sqlite3' );
 import fs = require( 'fs' );
+import lifesized = require( "lifesized" );
 
 import EmployeesManager = require( "./managers/EmployeesManager" );
 import AttendanceManager = require( "./managers/AttendanceManager" );
 import SettingsManager = require( "./managers/SettingsManager" );
-import SchedulesManager = require( "./managers/SchedulesManager" )
+import SchedulesManager = require( "./managers/SchedulesManager" );
+
+import PrinterWindow = require( "./printer/PrinterWindow" );
+import { RenderElement, DISPLAYTYPE } from "./printer/RenderData"
 
 let main, db = new sqlite3.Database( "data.db" );
 
@@ -34,17 +37,140 @@ class ElectronMainWindow {
             slashes: true
         }))
 
+        console.log( "dirname: ", __dirname );
+        
         // Handle print requests
         // NOT COMPLETE, NOT IMPLEMENTED
         ipcMain.on( "print", ( event, arg ) => {
-            this.window.webContents.printToPDF({}, (error, data) => {
+            let test = new PrinterWindow([
+                {
+                    type: DISPLAYTYPE.HEADER,
+                    headerSize: 2,
+                    headerText: "Test"
+                },
+                {
+                    type: DISPLAYTYPE.TABLE,
+                    tableCols: [
+                        {
+                            header: "Name",
+                            id: "name"
+                        },
+                        {
+                            header: "Age",
+                            id: "age"
+                        }
+                    ],
+                    tableData: [
+                        {
+                            name: "Michael Savchuk",
+                            age: 16
+                        },
+                        {
+                            name: "Test",
+                            age: 12324
+                        },
+                        {
+                            name: "Test2",
+                            age: 123
+                        }
+                    ]
+                },
+                {
+                    type: DISPLAYTYPE.MULTICOLUMN,
+                    columns: [
+                        {
+                    type: DISPLAYTYPE.TABLE,
+                    tableCols: [
+                        {
+                            header: "Name",
+                            id: "name"
+                        },
+                        {
+                            header: "Age",
+                            id: "age"
+                        }
+                    ],
+                    tableData: [
+                        {
+                            name: "Michael Savchuk",
+                            age: 16
+                        },
+                        {
+                            name: "Test",
+                            age: 12324
+                        },
+                        {
+                            name: "Test2",
+                            age: 123
+                        }
+                    ]
+                },
+                        {
+                    type: DISPLAYTYPE.TABLE,
+                    tableCols: [
+                        {
+                            header: "Name",
+                            id: "name"
+                        },
+                        {
+                            header: "Age",
+                            id: "age"
+                        }
+                    ],
+                    tableData: [
+                        {
+                            name: "Michael Savchuk",
+                            age: 16
+                        },
+                        {
+                            name: "Test",
+                            age: 12324
+                        },
+                        {
+                            name: "Test2",
+                            age: 123
+                        }
+                    ]
+                },
+                {
+                    type: DISPLAYTYPE.TABLE,
+                    tableCols: [
+                        {
+                            header: "Name",
+                            id: "name"
+                        },
+                        {
+                            header: "Age",
+                            id: "age"
+                        }
+                    ],
+                    tableData: [
+                        {
+                            name: "Michael Savchuk",
+                            age: 16
+                        },
+                        {
+                            name: "Test",
+                            age: 12324
+                        },
+                        {
+                            name: "Test2",
+                            age: 123
+                        }
+                    ]
+                }
+                    ]
+                }
+            ]);
+            
+            /*this.window.webContents.printToPDF({}, (error, data) => {
                 if (error) throw error
-                fs.writeFile('', data, (error) => {
+                fs.writeFile( "C:/Users/pixel/Junk/PRINTOUTPUT/print.pdf" , data, (error) => {
                 if (error) throw error
-
+                else shell.openExternal( "C:/Users/pixel/Junk/PRINTOUTPUT/print.pdf" );
             })
             event.sender.send( "print-done" );
-            })
+            })*/
         } )
 
         this.contents = this.window.webContents;

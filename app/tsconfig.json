@@ -3,7 +3,7 @@
         "alwaysStrict": false,
         "module": "amd",
         "outFile": "app.js",
-        "target": "es6",
+        "target": "es5",
         "removeComments": true
     },
     "exclude": [
