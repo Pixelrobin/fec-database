@@ -17,5 +17,5 @@ rmdir "views" /s /q
 del "app.ts"
 del "tsconfig.json"
 cd ..
-call electron-packager . --overwrite --asar=true --platform=win32 --arch=x64 --icon=icon.ico --prune=true --out=release-builds
+call electron-packager . --overwrite --asar=true --platform=win32 --arch=x64 --icon=icon.ico --prune=true --out=release-builds --version-string.FileDescription="FEC Database"
 cd ..

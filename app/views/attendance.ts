@@ -2,7 +2,6 @@
 
 import uiWrappers = require( "models/uiWrappers" );
 import InfoCard = require( "models/InfoCard" );
-import PrinterWindow = require( "models/PrinterWindow" );
 
 //import { RenderElement, DISPLAYTYPE } from "../../printer/RenderData"
 
@@ -49,7 +48,7 @@ export = new class {
     // Hours infocard
     HoursInfoCard: InfoCard = new InfoCard( "HoursInfoCard", [
         { header: 1, value: "title", default: "No date selected" },
-        { header: 3, value: "desc", default: "Select a date to view/edit its data." },
+        { header: 3, value: "desc", default: "Select a date to view/edit it's data." },
         { header: 5, value: "subtext", default: "" }
     ], 150 );
 
@@ -323,7 +322,7 @@ export = new class {
         this.HoursInfoCard.setData({
             title: this.selectedDate.format( "DD MMMM YYYY" ),
             desc: desc,
-            subtext: `You can set opeining/closing dates in the settings.`
+            subtext: `You can set opening/closing dates in the settings.`
         })
 
         this.GeneralInfoCard.setData({

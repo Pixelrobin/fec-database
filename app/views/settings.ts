@@ -4,6 +4,8 @@
 
 import uiWrappers = require( "models/uiWrappers" );
 
+declare const ipcRenderer: Electron.IpcRenderer;
+
 export = new class {
     $ui: any;
 

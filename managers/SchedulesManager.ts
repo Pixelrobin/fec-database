@@ -35,7 +35,7 @@ export function init( database: sqlite3.Database ) {
     // Get events in a certain schedule
     ipcMain.on( "get-schedule-events", ( event, arg ) => {
         db.serialize( () => {
-            db.all( `SELECT * FROM scheduleData WHERE scheduleId = ?`, arg, ( err, rows ) => {
+            db.all( `SELECT * FROM scheduleData WHERE scheduleId = ?;`, arg, ( err, rows ) => {
                 if ( err ) throw err;
                 event.sender.send( "get-schedule-events-reply", rows );
             })
@@ -61,10 +61,10 @@ export function init( database: sqlite3.Database ) {
             db.run(
                 `UPDATE schedules SET
                     name = ?
-                WHERE id = ?`, [
+                WHERE id = ?;`, [
                     arg.name, arg.id
                 ], ( err ) => {
-                    if ( !err ) throw err;
+                    if ( err !== null ) throw err;
                     else returnScheduleNames( event );
                 }
             )
@@ -74,11 +74,18 @@ export function init( database: sqlite3.Database ) {
     // Delete a schedule, including all it's events
     ipcMain.on( "delete-schedule", ( event, arg ) => {
         db.serialize( () => {
-            db.run( `DELETE FROM scheduleData WHERE scheduleId = ?`, arg );
-            db.run( `DELETE FROM schedules WHERE id = ?`, arg, ( err ) => {
+            db.run( `DELETE FROM scheduleData WHERE scheduleId = ?;`, arg, ( err ) => {
                 if ( err ) throw err;
-                else returnScheduleNames( event );
+                else {
+                    db.run( `DELETE FROM schedules WHERE id = ?;`, arg, ( err ) => {
+                        if ( err ) throw err;
+                        else {
+                            returnScheduleNames( event );
+                        }
+                    });
+                }
             });
+            
         })
     })
 

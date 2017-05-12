@@ -19,7 +19,7 @@ Program for managing employees, schedules and customer attendance records for a 
 4. The main file is `main.js`
 
 ## Building
-This was made for/on windows. It was not tested on other platforms, though it should with minor effort.
+In case you wish to build this project from scratch, here are the instructions. This was made for/on windows. It was not tested on other platforms, though it should with minor effort.
 1. Install `Nodejs`, then also install `Typescript` and `electron-rebuild` via `npm`.
 ```
 npm install -g typescript
@@ -44,3 +44,27 @@ npm run build
 ```
 npm run start
 ```
+
+## Building for production
+To create a packaged windows app, first build the project using the instructions above, then follow these additional steps.
+1. Change the `main` property in package.json to just `main.js` so it looks like this:
+```
+"main": "main.js"
+```
+2. Install electron-packager
+```
+npm install -g electron-packager
+```
+3. Run the final build script
+```
+npm run build-final
+```
+
+## Copyright Notices
+* The icon used for this project was made by [Madebyoliver](http://www.flaticon.com/authors/madebyoliver) from [www.flaticon.com](http://www.flaticon.com/). Used under the [Flaticon Basic License](http://file000.flaticon.com/downloads/license/license.pdf)
+* This project also includes multiple source files for existing lcensed software. They are as follows:
+    * [Webix library](https://webix.com/) used under GPL v3 license. Copyright (c) XB Software 2013-2017.
+    * [FullCalendar](https://fullcalendar.io/) used under open-source MIT license. Copyright (c) 2015 Adam Shaw.
+    * [Skeleton CSS library](http://getskeleton.com/) used and modified under open-source MIT license. Copyright (c) 2011-2014 Dave Gamache.
+    * [moment.js library](https://momentjs.com/) Used under open-source MIT license. Copyright (c) JS Foundation and other contributors.
+    * [JQuery library](https://jquery.com/) Used under modified open-source MIT license. Click [here](https://github.com/jquery/jquery/blob/master/LICENSE.txt) for more information. Copyright JS Foundation and other contributors.
