@@ -401,7 +401,8 @@ export = new class {
     // Disable or enable editor parts of the ui
     disable( disable: boolean ): void {
         const things = [
-            $$( "EventEditorTitle" ), $$( "CalendarTitle" ), $$( "scheduleName" )
+            $$( "EventEditorTitle" ), $$( "CalendarTitle" ),
+            $$( "scheduleName" ), $$( "printSchedule" )
         ]
 
         if ( disable ) for ( let t of things ) t.disable();

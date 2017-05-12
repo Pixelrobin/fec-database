@@ -1,11 +1,13 @@
 {
-  "name": "loading...",
-  "version": "0.1.0",
-  "description": "FEC Database",
+  "name": "fec-database",
+  "productName": "FEC Database",
+  "version": "1.0.0",
+  "description": "A database manager for all your FEC handling needs!",
   "main": "build/main.js",
   "scripts": {
     "build": "build.bat",
-    "start": "electron ."
+    "start": "electron .",
+    "build-final": "build-final.bat"
   },
   "keywords": [],
   "devDependencies": {

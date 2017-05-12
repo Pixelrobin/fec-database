@@ -26,7 +26,8 @@ class ElectronMainWindow {
             minHeight: 720,
             minWidth: 960,
             width: 960,
-            height: 720
+            height: 720,
+            title: "FEC Database"
         })
 
         // load the file
@@ -43,8 +44,8 @@ class ElectronMainWindow {
         });
 
         this.contents = this.window.webContents;
-        this.contents.openDevTools();
-        //this.window.setMenu(null);
+        //this.contents.openDevTools();
+        this.window.setMenu(null);
 
         // Delete window reference on close
         this.window.on( "closed", () => {
