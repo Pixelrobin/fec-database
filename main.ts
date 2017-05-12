@@ -4,15 +4,14 @@ import path = require( 'path' );
 import url = require( 'url' );
 import sqlite3 = require( 'sqlite3' );
 import fs = require( 'fs' );
-import lifesized = require( "lifesized" );
+import temp = require( "temp" );
 
 import EmployeesManager = require( "./managers/EmployeesManager" );
 import AttendanceManager = require( "./managers/AttendanceManager" );
 import SettingsManager = require( "./managers/SettingsManager" );
 import SchedulesManager = require( "./managers/SchedulesManager" );
 
-import PrinterWindow = require( "./printer/PrinterWindow" );
-import { RenderElement, DISPLAYTYPE } from "./printer/RenderData"
+import PrintHandler = require( "./printer/PrintHandler" );
 
 let main, db = new sqlite3.Database( "data.db" );
 
@@ -42,136 +41,8 @@ class ElectronMainWindow {
         // Handle print requests
         // NOT COMPLETE, NOT IMPLEMENTED
         ipcMain.on( "print", ( event, arg ) => {
-            let test = new PrinterWindow([
-                {
-                    type: DISPLAYTYPE.HEADER,
-                    headerSize: 2,
-                    headerText: "Test"
-                },
-                {
-                    type: DISPLAYTYPE.TABLE,
-                    tableCols: [
-                        {
-                            header: "Name",
-                            id: "name"
-                        },
-                        {
-                            header: "Age",
-                            id: "age"
-                        }
-                    ],
-                    tableData: [
-                        {
-                            name: "Michael Savchuk",
-                            age: 16
-                        },
-                        {
-                            name: "Test",
-                            age: 12324
-                        },
-                        {
-                            name: "Test2",
-                            age: 123
-                        }
-                    ]
-                },
-                {
-                    type: DISPLAYTYPE.MULTICOLUMN,
-                    columns: [
-                        {
-                    type: DISPLAYTYPE.TABLE,
-                    tableCols: [
-                        {
-                            header: "Name",
-                            id: "name"
-                        },
-                        {
-                            header: "Age",
-                            id: "age"
-                        }
-                    ],
-                    tableData: [
-                        {
-                            name: "Michael Savchuk",
-                            age: 16
-                        },
-                        {
-                            name: "Test",
-                            age: 12324
-                        },
-                        {
-                            name: "Test2",
-                            age: 123
-                        }
-                    ]
-                },
-                        {
-                    type: DISPLAYTYPE.TABLE,
-                    tableCols: [
-                        {
-                            header: "Name",
-                            id: "name"
-                        },
-                        {
-                            header: "Age",
-                            id: "age"
-                        }
-                    ],
-                    tableData: [
-                        {
-                            name: "Michael Savchuk",
-                            age: 16
-                        },
-                        {
-                            name: "Test",
-                            age: 12324
-                        },
-                        {
-                            name: "Test2",
-                            age: 123
-                        }
-                    ]
-                },
-                {
-                    type: DISPLAYTYPE.TABLE,
-                    tableCols: [
-                        {
-                            header: "Name",
-                            id: "name"
-                        },
-                        {
-                            header: "Age",
-                            id: "age"
-                        }
-                    ],
-                    tableData: [
-                        {
-                            name: "Michael Savchuk",
-                            age: 16
-                        },
-                        {
-                            name: "Test",
-                            age: 12324
-                        },
-                        {
-                            name: "Test2",
-                            age: 123
-                        }
-                    ]
-                }
-                    ]
-                }
-            ]);
-            
-            /*this.window.webContents.printToPDF({}, (error, data) => {
-                if (error) throw error
-                fs.writeFile( "C:/Users/pixel/Junk/PRINTOUTPUT/print.pdf" , data, (error) => {
-                if (error) throw error
-                else shell.openExternal( "C:/Users/pixel/Junk/PRINTOUTPUT/print.pdf" );
-            })
-            event.sender.send( "print-done" );
-            })*/
-        } )
+            this.print( arg );
+        });
 
         this.contents = this.window.webContents;
         this.contents.openDevTools();
@@ -182,6 +53,17 @@ class ElectronMainWindow {
             this.window = null
         })
 
+        console.log( "window created" );
+
+    }
+
+    print( data ): void {
+        if ( tempPath !== null ) {
+            PrintHandler.print(
+                data.elements,
+                path.join( tempPath, data.filename )
+            );
+        }
     }
 }
 
@@ -192,9 +74,17 @@ AttendanceManager.init( db );
 SettingsManager.init( db );
 SchedulesManager.init( db );
 
+// Set up a temporary directory for storing pdf files
+let tempPath = null;
+temp.track(); // Delete the directory on close
+temp.mkdir( "tempfiles", ( err: any, path: string ) => {
+    if ( err ) throw err
+    else tempPath = path;
+});
+
 // Create window when ready
 app.on( "ready", () => {
-    main = new ElectronMainWindow( "app/index.html" )
+    main = new ElectronMainWindow( "app/index.html" );
 });
 
 // Quit when all windows are closed.

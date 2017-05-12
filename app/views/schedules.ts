@@ -4,6 +4,8 @@ import uiWrappers = require( "models/uiWrappers" );
 import WeeklyScheduler = require( "models/WeeklyScheduler" );
 import EventForm = require( "models/EventForm" );
 
+declare const ipcRenderer: Electron.IpcRenderer;
+
 export = new class {
     $ui: any; // Webix jet ui
 
@@ -56,13 +58,14 @@ export = new class {
         // 'Add Event' and 'Delete Event' buttons
         const buttons = [
             { view:"button", id:"addEvent", type: "form", align:"left", label: "Add Event", autowidth: true, popup: "popupEventForm" },
-            { view:"button", id:"deleteEvent", type: "danger", align:"left", label: "Delete Event", autowidth: true }
+            { view:"button", id:"deleteEvent", type: "danger", align:"left", label: "Delete Event", autowidth: true },
         ]
 
         // 'Add' and 'Delete' Schedule buttons
         const listButtons = [
             { view:"button", id:"addSchedule", type: "form", align:"left", label: "Add", autowidth: true },
-            { view:"button", id:"deleteSchedule", type: "danger", align:"left", label: "Delete", autowidth: true }
+            { view:"button", id:"deleteSchedule", type: "danger", align:"left", label: "Delete", autowidth: true },
+            { view:"button", id:"printSchedule", type: "form", align:"left", label: "Print", autowidth: true }
         ]
 
         // Schedule name editor form
@@ -138,6 +141,7 @@ export = new class {
             deleteEventButton    = $$( "deleteEvent" ) as webix.ui.button,
             addScheduleButton    = $$( "addSchedule" ) as webix.ui.button,
             deleteScheduleButton = $$( "deleteSchedule" ) as webix.ui.button,
+            printScheduleButton  = $$( "printSchedule" ) as webix.ui.button,
             scheduleName         = $$( "scheduleName" ) as webix.ui.text,
             list                 = $$( "scheduleList" ) as webix.ui.list;
         
@@ -152,6 +156,7 @@ export = new class {
         deleteEventButton.attachEvent( "onItemClick", () => { this.scheduler.deleteEvent(); });
         addScheduleButton.attachEvent( "onItemClick", () => { this.addSchedule() } );
         deleteScheduleButton.attachEvent( "onItemClick", () => { this.deleteSelectedSchedule() } );
+        printScheduleButton.attachEvent( "onItemClick", () => { this.print() } );
 
         list.attachEvent( "onSelectChange", () => {
             this.updateFormValues( list.getSelectedItem( false ) );
@@ -283,6 +288,118 @@ export = new class {
                 ipcRenderer.send( "get-schedule-events", this.selectedItem.id );
             }
         } else this.disable( true );
+    }
+
+    // Prints the currently selected schedule
+    // This is a lot more complex then I'd though it'd be
+    print(): void {
+        const eventData = this.scheduler.getAllEvents(),
+            // It's faster to declare weekdays like this instead of using moment()
+            weekdays = [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday"
+            ]
+            
+        let eventsByWeek = [], // Events sorted by day of week
+            rows = [],         // Table element grid
+            row = 0,           // Used for making grids
+            column = 0;        // Used for making grids
+        
+        // Sort the events into their respectable weekdays
+        for ( let e of eventData ) {
+            // e.start and e.end are moment() instances
+            const day = e.start.day();
+            
+            // Create the secondary array if it doesn't exist
+            if ( eventsByWeek[ day ] === undefined )
+                eventsByWeek[ day ] = [];
+            
+            // Push the table data into the event
+            eventsByWeek[ day ].push({
+                title: e.title,
+                start: e.start.format( "hh:mm A" ),
+                end: e.end.format( "hh:mm A" )
+            });
+        }
+
+        // Add the tables per week
+        for ( let w in eventsByWeek ) {
+
+            // Make sure there are events in that weekday
+            // If there are not, we don't render them
+            if ( eventsByWeek[ w ] !== undefined ) {
+                // Sort the events in a day by their times using
+                // moment() functions
+                eventsByWeek[ w ].sort( ( a, b ) => {
+                    // Any because switching from boolean to number
+                    let check: any = moment( b ).isAfter( moment( a ) );
+                    check = check === 0 ? -1 : check;
+                    return check;
+                })
+
+                // If the current row array is undefined, create it.
+                if ( rows[ row ] == undefined ) rows[ row ] = [];
+
+                // Insert a new column into the row
+                rows[ row ][ column ] = [
+                    {
+                        type: "header",
+                        headerSize: 6,
+                        headerText: weekdays[ w ]
+                    },
+                    {
+                        type: "table",
+                        tableCols: [
+                            { id: "title", header: "Event" },
+                            { id: "start", header: "Start Time" },
+                            { id: "end", header: "End Time" }
+                        ],
+                        tableData: []
+                    }
+                ]
+
+                // Fill the column with that day's data
+                for ( let e of eventsByWeek[ w ] ) {
+                    rows[ row ][ column ][ 1 ].tableData.push( e );
+                }
+
+                // Allow only a max of 3 columns per row
+                column ++;
+                if ( column === 3 ) {
+                    column = 0;
+                    row ++;
+                }
+            }
+        }
+
+        // Make the final element data
+        let data: RenderElement[] = [
+            {
+                type: "header",
+                headerSize: 4,
+                headerText: `Schedule Report: ${ this.selectedItem.name }`
+            }
+        ]
+
+        // Fill it with the rows
+        for ( let r in rows ) {
+            data.push({
+                type: "multicolumn",
+                columns: rows[ r ]
+            })
+        }
+
+        // Print it
+        ipcRenderer.send( "print", {
+            elements: data,
+            filename: `${ this.selectedItem.name }.pdf`
+        });
+
     }
 
     // Disable or enable editor parts of the ui

@@ -30,13 +30,13 @@ export function init( database: sqlite3.Database ) {
             db.all( `SELECT * FROM attendance WHERE date BETWEEN ? AND ?;`,
                 [ arg.start, arg.end ],
                 ( err, rows ) => {
-                    if ( err ) console.log( err );
+                    if ( err ) throw err;
                     else {
                         result.weekrows = rows;
                         db.all( `SELECT * FROM attendance WHERE date = ?`,
                             arg.day,
                             ( err, rows ) => {
-                                if ( err ) console.log( err );
+                                if ( err ) throw err;
                                 else {
                                     result.dayrows = rows;
                                     event.sender.send( "get-attendance-data-reply", result );
@@ -62,7 +62,7 @@ export function init( database: sqlite3.Database ) {
                                 ?, ?, ?
                             );
                         `, [ arg.date, d.id, d.visits ], ( err ) => {
-                            if ( err ) console.log( err );
+                            if ( err ) throw err;
                         }
                     )
                 }

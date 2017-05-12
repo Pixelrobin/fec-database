@@ -36,7 +36,8 @@ export function init( database: sqlite3.Database ) {
     ipcMain.on( "get-schedule-events", ( event, arg ) => {
         db.serialize( () => {
             db.all( `SELECT * FROM scheduleData WHERE scheduleId = ?`, arg, ( err, rows ) => {
-                if ( !err ) event.sender.send( "get-schedule-events-reply", rows );
+                if ( err ) throw err;
+                event.sender.send( "get-schedule-events-reply", rows );
             })
         })
     });
@@ -47,8 +48,8 @@ export function init( database: sqlite3.Database ) {
             db.run(
                 "INSERT INTO schedules( name ) VALUES( ? );",
                 [ arg ], ( err ) => {
-                    if ( !err ) returnScheduleNames( event );
-                    else console.log( err );
+                    if ( err ) throw err;
+                    else returnScheduleNames( event );
                 }
             );
         });
@@ -63,8 +64,8 @@ export function init( database: sqlite3.Database ) {
                 WHERE id = ?`, [
                     arg.name, arg.id
                 ], ( err ) => {
-                    if ( !err ) returnScheduleNames( event );
-                    else console.log( err )
+                    if ( !err ) throw err;
+                    else returnScheduleNames( event );
                 }
             )
         } );
@@ -75,7 +76,8 @@ export function init( database: sqlite3.Database ) {
         db.serialize( () => {
             db.run( `DELETE FROM scheduleData WHERE scheduleId = ?`, arg );
             db.run( `DELETE FROM schedules WHERE id = ?`, arg, ( err ) => {
-                returnScheduleNames( event );
+                if ( err ) throw err;
+                else returnScheduleNames( event );
             });
         })
     })
@@ -90,7 +92,7 @@ export function init( database: sqlite3.Database ) {
                 ) VALUES (
                     $eventId, $scheduleId, $title, $startTime, $endTime, $day
                 );
-            `, args, ( err ) => { if ( err ) console.log( err ) } )
+            `, args, ( err ) => { if ( err ) throw err } )
         })
     });
 
@@ -99,7 +101,7 @@ export function init( database: sqlite3.Database ) {
         db.serialize( () => {
             db.run( `
                 DELETE FROM scheduleData WHERE eventId = ?
-            `, args, ( err ) => { if ( err ) console.log( err ) } )
+            `, args, ( err ) => { if ( err ) throw err } )
         })
     })
 
@@ -110,7 +112,8 @@ export function init( database: sqlite3.Database ) {
 function returnScheduleNames( event: Electron.IpcMainEvent ) {
     db.serialize( () => {
         db.all( "SELECT * FROM schedules;", ( err, rows ) => {
-            event.sender.send( "get-schedule-names-reply", rows )
+            if ( err ) throw err;
+            else event.sender.send( "get-schedule-names-reply", rows )
         });
     })
 }

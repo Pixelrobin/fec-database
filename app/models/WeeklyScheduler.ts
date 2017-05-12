@@ -122,6 +122,11 @@ class WeeklyScheduler implements FC.Options {
 			});
 		}
 	}
+
+	// Get all the events on the scheduler
+	getAllEvents(): FC.EventObject[] {
+		return this.$id().fullCalendar( "clientEvents" );
+	}
 	
 	// Clear all the calendar events
 	clear(): void {

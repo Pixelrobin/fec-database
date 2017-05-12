@@ -41,7 +41,8 @@ export function init( database: sqlite3.Database ) {
                     arg.name, arg.category, arg.email,
                     arg.phone, arg.comments, arg.id
                 ], ( err ) => {
-                    if ( !err ) returnEmployeeData( event, arg.id );
+                    if ( err ) throw err;
+                    else returnEmployeeData( event, arg.id );
                 }
             )
         } );
@@ -56,7 +57,8 @@ export function init( database: sqlite3.Database ) {
             )
 
             db.get( "SELECT last_insert_rowid();", ( err, row ) => {
-                if ( !err ) returnEmployeeData( event, row[ "last_insert_rowid()" ] )
+                if ( err ) throw err;
+                else returnEmployeeData( event, row[ "last_insert_rowid()" ] );
             } )
         } )
     } );
@@ -65,7 +67,8 @@ export function init( database: sqlite3.Database ) {
     ipcMain.on( "delete-employee", ( event, arg ) => {
         db.serialize( () => {
             db.run( "DELETE FROM employees WHERE id = ?", arg, ( err ) => {
-                returnEmployeeData( event );
+                if ( err ) throw err;
+                else returnEmployeeData( event );
             })
         })
     } );
@@ -76,7 +79,8 @@ export function init( database: sqlite3.Database ) {
 function returnEmployeeData( event: Electron.IpcMainEvent, id?: number ) {
     let callback = ( err, rows ) => {
         // Send the result back
-        if ( !err ) event.sender.send( "employee-list-reply", {
+        if ( err ) throw err;
+        else event.sender.send( "employee-list-reply", {
             rows: rows,
             id: id === undefined ? null : id
         } );

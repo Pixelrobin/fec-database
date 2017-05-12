@@ -3,6 +3,8 @@
 
 import app = require( "app" );
 
+declare const ipcRenderer: Electron.IpcRenderer;
+
 export = new class {
     $ui: any; // Webix jet ui
     
@@ -11,7 +13,7 @@ export = new class {
     $menu: string;
 
     constructor() {
-
+        console.log( "hello from top" );
         // Header element
         var header: webix.ui.toolbarConfig = {
             view: "toolbar",

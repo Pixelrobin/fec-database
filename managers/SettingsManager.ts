@@ -39,8 +39,9 @@ export function init( database: sqlite3.Database ) {
 
     // Set the business settings (just business name for now)
     ipcMain.on( "set-business-settings", ( event, arg ) => {
-        db.run( `UPDATE settings SET value = ? WHERE name = "Name"`, arg.name, () => {
-            event.sender.send( "reset-business-name", arg.name )
+        db.run( `UPDATE settings SET value = ? WHERE name = "Name"`, arg.name, ( err ) => {
+            if ( err ) throw err;
+            else event.sender.send( "reset-business-name", arg.name )
         } );
     } );
 
@@ -49,7 +50,8 @@ export function init( database: sqlite3.Database ) {
     // It just currently only contains a name property
     ipcMain.on( "get-business-name", ( event, arg ) => {
         db.get( `SELECT value FROM settings WHERE name="name";`, ( err, row ) => {
-            event.sender.send( "get-business-name-reply", row.value )
+            if ( err ) throw err;
+            else event.sender.send( "get-business-name-reply", row.value )
         } );
     } );
     
@@ -68,7 +70,7 @@ export function init( database: sqlite3.Database ) {
                         endMinute=$endMinute
                     WHERE day=$day;
                 `, arg[ day ], ( err ) => {
-                    if ( err ) console.log( err )
+                    if ( err ) throw err;
                 } )
             }
         });
@@ -78,8 +80,9 @@ export function init( database: sqlite3.Database ) {
     ipcMain.on( "get-week-settings", ( event, arg ) => {
         db.serialize( () => {
             db.all( "SELECT * FROM hours;", ( err, rows ) => {
-                event.sender.send( "get-week-settings-reply", rows );
-            } )
+                if ( err ) throw err;
+                else event.sender.send( "get-week-settings-reply", rows );
+            });
         });
     });
 }

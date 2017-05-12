@@ -4,6 +4,10 @@ import uiWrappers = require( "models/uiWrappers" );
 import InfoCard = require( "models/InfoCard" );
 import PrinterWindow = require( "models/PrinterWindow" );
 
+//import { RenderElement, DISPLAYTYPE } from "../../printer/RenderData"
+
+declare const ipcRenderer: Electron.IpcRenderer; // Already declared in index.html
+
 // Attendance datatable interface
 interface AttendanceDatatable {
     id: number,
@@ -103,7 +107,7 @@ export = new class {
 
         // Print button (in array because thats what wrapInTitle requires)
         const dataButtons: webix.ui.buttonConfig[] = [
-            { view:"button", id:"schedulePrint", type: "form", align:"left", label: "Generate Report", autowidth: true }
+            { view:"button", id:"attendancePrint", type: "form", align:"left", label: "Print Report", autowidth: true }
         ]
 
         // Custom datatable text editor
@@ -144,9 +148,9 @@ export = new class {
     $oninit = () => {
         let calendar = $$( "attendanceCalendar" ) as webix.ui.calendar,
             datatable = $$( "attendanceDatatable" ) as webix.ui.datatable,
-            schedulePrint = $$( "schedulePrint" ) as webix.ui.button;
+            attendancePrint = $$( "attendancePrint" ) as webix.ui.button;
         
-        schedulePrint.attachEvent( "onItemClick", () => { this.print() } );
+        attendancePrint.attachEvent( "onItemClick", () => { this.print() } );
 
         // Events
         calendar.attachEvent( "onDateSelect", ( date: Date ) => {
@@ -329,15 +333,28 @@ export = new class {
 
     // Print the data (unused for now)
     print(): void {
-        const datatable = this.datatable;
-        datatable.scroll = false;
-        datatable.data = this.data.day.visitsPerHour;
-        datatable.editable = false;
-
-        let test = [
-            this.datatable
+        const datatable = $$( "attendanceDatatable" ) as webix.ui.datatable;
+        let data: RenderElement[] = [
+            {
+                type: "header",
+                headerSize: 4,
+                headerText:
+                    `Attendance report: ${this.selectedDate.format( "dddd, MMMM Do YYYY" )}`
+            },
+            {
+                type: "table",
+                tableCols: [
+                    { id: "hour", header: "Hour" },
+                    { id: "visits", header: "Visits" }
+                ],
+                tableData: datatable.serialize()
+            }
         ]
-        let PrintWin = new PrinterWindow( "pw", "Customer Attendance Report", test );
+
+        ipcRenderer.send( "print", {
+            elements: data,
+            filename: "Attendance Report.pdf"
+        })
     }
 
     // Format hour and minute numbers into HH:MM AM/PM format string
