@@ -10,14 +10,10 @@ interface EventFormInputs {
     submit: webix.ui.button,
 }
 
-class EventForm implements webix.ui.formConfig {
-    // Webix component configs
-    view = "form";
-    autoheight = false;
-    elements = null;
+export class EventFormHandler implements webix.ui.formConfig {
     id: string;
-    formInputs: EventFormInputs;
 
+    formInputs: EventFormInputs;
     event: FC.EventObject; // Event to edit
     eventChangeCallback: Function = null; // Callback on event submit
 
@@ -25,51 +21,10 @@ class EventForm implements webix.ui.formConfig {
     // to the database when being loaded from it.
     skipChanges: boolean = false;
 
-    constructor( id: string ) {
-        // Form elements
-        this.elements = [
-            { view: "text", id: id + "Name", placeholder: "Event Name", label: "Event Name", labelPosition: "top"  },
-            { cols: [
-                { view: "datepicker", id: id + "Start", type:"time", stringResult:true, label: "Start Time", labelPosition: "top" },
-                { view: "datepicker", id: id + "End", type:"time", stringResult:true, label: "End Time", labelPosition: "top" }
-            ]},
-            //{ view:"checkbox", id: id + "Repeted", label: "Recurring event", value: 1 }
-            { view: "richselect", id: id + "Day", label: "Day of Week", labelPosition: "top", value: "Sunday", yCount: "7", options: [
-                { id: 1, value: "Sunday" },
-                { id: 2, value: "Monday" },
-                { id: 3, value: "Tuesday" },
-                { id: 4, value: "Wednesday" },
-                { id: 5, value: "Thursday" },
-                { id: 6, value: "Friday" },
-                { id: 7, value: "Saturday" }
-            ]},
-            /*{ view: "list", autoheight: true, select: true, multiselect: true, template: "#value#", data: [
-                { id: 0, value: "Sunday" },
-                { id: 1, value: "Monday" },
-                { id: 2, value: "Tuesday" },
-                { id: 3, value: "Wednesday" },
-                { id: 4, value: "Thursday" },
-                { id: 5, value: "Friday" },
-                { id: 6, value: "Saturday" }
-            ]
-            },*/
-            { view:"button", id: id + "Submit", value:"Submit", type: "form" }
-            /*{ cols: [
-                { view:"button", id: id + "Submit", value:"Submit", type: "form" },
-                { view:"button", id: id + "Cancel", value:"Cancel" }
-            ]}*/
-        ]
-
-        this.id = id;
-    }
-
-    // Initiate the form (just callback for now)
-    init( eventChangeCallback: Function ): void {
+    constructor( id: string, eventChangeCallback: Function ) {
         this.eventChangeCallback = eventChangeCallback;
-    }
+        this.id = id;
 
-    // Initiate the ui references (called once ui is loaded, unline init())
-    initUi(): void {
         // Fill 'this.FormInputs' with components
         this.formInputs = {
             name:   ( $$( this.id + "Name"   ) as webix.ui.text       ),
@@ -82,6 +37,26 @@ class EventForm implements webix.ui.formConfig {
         // 'Submit' button press events
         this.formInputs.submit.attachEvent( "onItemClick", () => { this.submitChanges() } )
     }
+
+    // Initiate the form (just callback for now)
+    /*init( eventChangeCallback: Function ): void {
+        this.eventChangeCallback = eventChangeCallback;
+    }*/
+
+    // Initiate the ui references (called once ui is loaded, unlike init())
+    /*initUi(): void {
+        // Fill 'this.FormInputs' with components
+        this.formInputs = {
+            name:   ( $$( this.id + "Name"   ) as webix.ui.text       ),
+            start:  ( $$( this.id + "Start"  ) as webix.ui.datepicker ),
+            end:    ( $$( this.id + "End"    ) as webix.ui.datepicker ),
+            day:    ( $$( this.id + "Day"    ) as webix.ui.richselect ),
+            submit: ( $$( this.id + "Submit" ) as webix.ui.button     ),
+        }
+
+        // 'Submit' button press events
+        this.formInputs.submit.attachEvent( "onItemClick", () => { this.submitChanges() } )
+    }*/
 
     // Update the form with new event data
     update( newEvent: FC.EventObject ) {
@@ -159,4 +134,29 @@ class EventForm implements webix.ui.formConfig {
 
 }
 
-export = EventForm;
+export function createEventFormUI( id: string ): webix.ui.formConfig {
+    return {
+        // Webix component configs
+        view: "form",
+        autoheight: false,
+        id: id,
+        elements: [
+            { view: "text", id: id + "Name", placeholder: "Event Name", label: "Event Name", labelPosition: "top"  },
+            { cols: [
+                { view: "datepicker", id: id + "Start", type:"time", stringResult:true, label: "Start Time", labelPosition: "top" },
+                { view: "datepicker", id: id + "End", type:"time", stringResult:true, label: "End Time", labelPosition: "top" }
+            ]},
+            //{ view:"checkbox", id: id + "Repeted", label: "Recurring event", value: 1 }
+            { view: "richselect", id: id + "Day", label: "Day of Week", labelPosition: "top", value: "Sunday", yCount: "7", options: [
+                { id: 1, value: "Sunday" },
+                { id: 2, value: "Monday" },
+                { id: 3, value: "Tuesday" },
+                { id: 4, value: "Wednesday" },
+                { id: 5, value: "Thursday" },
+                { id: 6, value: "Friday" },
+                { id: 7, value: "Saturday" }
+            ]},
+            { view:"button", id: id + "Submit", value:"Submit", type: "form" }
+        ]
+    }
+}

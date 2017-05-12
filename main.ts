@@ -44,7 +44,7 @@ class ElectronMainWindow {
         });
 
         this.contents = this.window.webContents;
-        //this.contents.openDevTools();
+        this.contents.openDevTools();
         this.window.setMenu(null);
 
         // Delete window reference on close

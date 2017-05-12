@@ -2,7 +2,7 @@
 
 import uiWrappers = require( "models/uiWrappers" );
 import WeeklyScheduler = require( "models/WeeklyScheduler" );
-import EventForm = require( "models/EventForm" );
+import { EventFormHandler, createEventFormUI } from "models/EventForm"
 
 declare const ipcRenderer: Electron.IpcRenderer;
 
@@ -14,12 +14,16 @@ export = new class {
     
     // Webix form for setting event data (see 'models/WeeklyScheduler')
     // Used twice, so its it's own class
-    form: EventForm = new EventForm( "SE" ); // Form for editing currently selected event
-    popupForm: EventForm = new EventForm( "SEP" ); // Form for 'Add' popup
+    form: EventFormHandler; // Form for editing currently selected event
+    popupForm: EventFormHandler; // Form for 'Add' popup
     
     selectedItem: any = null; // Currently selected item
 
     constructor() {
+        // Forms
+        const formUI = createEventFormUI( "SE" );
+        const popupFormUI = createEventFormUI( "SEP" );
+        
         // Scheduler ui
         const scheduler: webix.ui.templateConfig = {
             view: "template",
@@ -52,7 +56,7 @@ export = new class {
             id: "popupEventForm",
             head: "Create New Event",
             height: 400,
-            body: this.popupForm
+            body: popupFormUI
         }
 
         // 'Add Event' and 'Delete Event' buttons
@@ -88,7 +92,7 @@ export = new class {
                                     scheduleName
                                 ]
                             }, "Schedules", listButtons ),
-                            uiWrappers.wrapInTitle( "EventEditorTitle", this.form, "Event Editor" )
+                            uiWrappers.wrapInTitle( "EventEditorTitle", formUI, "Event Editor" )
                         ]
                     },
                     uiWrappers.wrapInTitle( "CalendarTitle", scheduler, "Outlook", buttons )
@@ -98,6 +102,7 @@ export = new class {
 
         webix.ui( popup );
 
+        /*
         // Form submit callbacks
         this.popupForm.init( ( newEvent: FC.EventObject ) => {
             this.scheduler.addEvent( newEvent );
@@ -106,8 +111,7 @@ export = new class {
 
         this.form.init( ( newEvent ) => {
             this.scheduler.submitChange( newEvent )
-        });
-
+        });*/
 
         // Scheduler callbacks
         this.scheduler.eventDataCallback = ( data: any ) => {            
@@ -141,6 +145,15 @@ export = new class {
             printScheduleButton  = $$( "printSchedule" ) as webix.ui.button,
             scheduleName         = $$( "scheduleName" ) as webix.ui.text,
             list                 = $$( "scheduleList" ) as webix.ui.list;
+
+        // Create form handlers
+        this.form = new EventFormHandler( "SE", ( newEvent: FC.EventObject ) => {
+            this.scheduler.submitChange( newEvent );
+        });
+        this.popupForm = new EventFormHandler( "SEP", ( newEvent: FC.EventObject ) => {
+            this.scheduler.addEvent( newEvent );
+            this.popupForm.hide();
+        });
         
         // Render the scheduler (FullCalendar) component
         // But check if the element exists yet
@@ -157,7 +170,6 @@ export = new class {
 
         list.attachEvent( "onSelectChange", () => {
             this.updateFormValues( list.getSelectedItem( false ) );
-            
         });
 
         scheduleName.attachEvent( "onTimedKeyPress", () => {
@@ -165,9 +177,9 @@ export = new class {
         })
 
         
-        // Initiate evet editor forms
-        this.form.initUi();
-        this.popupForm.initUi();
+        // Initiate event editor forms
+        //this.form.initUi();
+        //this.popupForm.initUi();
 
         this.popupForm.update( {
             title: "",
@@ -186,7 +198,7 @@ export = new class {
             this.parseEvents( arg );
         })
 
-        // Disabled by default (no schedule sected at start)
+        // Disabled by default (no schedule selected at start)
         this.disable( true );
     }
 
@@ -197,6 +209,10 @@ export = new class {
         ipcRenderer.removeAllListeners( "get-schedule-names-reply" );
         ipcRenderer.removeAllListeners( "get-schedule-events-reply" );
         this.selectedItem = null;
+        this.form.eventChangeCallback = null;
+        this.popupForm.eventChangeCallback = null;
+        delete this.form;
+        delete this.popupForm;
     }
 
     // Parse data (schedule names only)

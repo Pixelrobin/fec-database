@@ -8,7 +8,7 @@ xcopy "printer" "build/printer" /e /i /h /y
 copy "package.json" "./build"
 copy "icon.ico" "./build"
 cd build
-call npm install --production
+call npm install
 call electron-rebuild
 cd app
 rmdir "@types" /s /q
@@ -17,5 +17,5 @@ rmdir "views" /s /q
 del "app.ts"
 del "tsconfig.json"
 cd ..
-call electron-packager . --overwrite --asar=true --platform=win32 --arch=x64 --icon=icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"FEC Database\"
+call electron-packager . --overwrite --asar=true --platform=win32 --arch=x64 --icon=icon.ico --prune=true --out=release-builds
 cd ..
