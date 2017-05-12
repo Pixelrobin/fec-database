@@ -2,6 +2,8 @@
 
 import uiWrappers = require( "models/uiWrappers" );
 
+declare const ipcRenderer: Electron.IpcRenderer;
+
 export = new class {
     $ui: any; // webix jet ui
     selectedItem: any; // Currently selected employee
@@ -18,8 +20,9 @@ export = new class {
             columns: [
                 {
                     id:"name",
-                    header:[ {content:"textFilter"} ],
-                    width: 200
+                    header: "Name",//[ {content:"textFilter"} ],
+                    width: 200,
+                    sort: "string"
                 },
                 {
                     id:"category",

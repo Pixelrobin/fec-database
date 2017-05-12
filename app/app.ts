@@ -14,6 +14,4 @@ var app = core.create({
 
 app.use(menu);
 
-console.log( "hello from app" );
-
 export = app;

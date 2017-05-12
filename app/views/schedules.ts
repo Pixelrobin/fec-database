@@ -105,7 +105,6 @@ export = new class {
         });
 
         this.form.init( ( newEvent ) => {
-            console.log( "sending to scheduler" );
             this.scheduler.submitChange( newEvent )
         });
 
@@ -122,8 +121,6 @@ export = new class {
                 $endTime: data.event.end.format( "HH:mm" ),
                 $day: data.event.start.day()
             }
-
-            console.log( "ready to pass ", event );
 
             ipcRenderer.send( "submit-event", event );
         }
@@ -273,7 +270,6 @@ export = new class {
     // Update schedule name textbox and disable ui if needed
     // Also, get the events for a particular schedule from the database
     updateFormValues( obj: any ): void {
-        console.log( obj );
         if ( obj ) {
             if ( !this.selectedItem || obj.id !== this.selectedItem.id ) {
                 if ( obj ) {

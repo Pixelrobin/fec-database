@@ -119,7 +119,6 @@ class EventForm implements webix.ui.formConfig {
             
             ( this.event as any ).eventId = null;
 
-            console.log( this.event );
             if ( this.eventChangeCallback !== null ) {
                 this.eventChangeCallback( this.event );
             }

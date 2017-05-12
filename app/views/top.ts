@@ -13,7 +13,6 @@ export = new class {
     $menu: string;
 
     constructor() {
-        console.log( "hello from top" );
         // Header element
         var header: webix.ui.toolbarConfig = {
             view: "toolbar",
@@ -64,12 +63,18 @@ export = new class {
         // Listen for a change in the business name setting
         ipcRenderer.on( "reset-business-name", ( event, arg ) => {
             this.setBusinessName( arg );
-        })
+        });
 
+        // Get the business name and reset it
         ipcRenderer.send( "get-business-name" );
-    ipcRenderer.on( "get-business-name-reply", ( event, arg ) => {
+        ipcRenderer.on( "get-business-name-reply", ( event, arg ) => {
             this.setBusinessName( arg );
-        })
+        });
+
+        var elements: any = document.getElementsByClassName( "webix_list_item" );
+        for( let e = 0; e < elements.length; e ++ ) {
+            elements[ e ].ondragstart = () => { return false };
+        }
     }
 
     // Set business name on header

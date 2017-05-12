@@ -38,8 +38,6 @@ class WeeklyScheduler implements FC.Options {
 		
 		this.sendEventCallback( this.eventSelection );
 		this.$id().fullCalendar( "updateEvent", event );
-
-		console.log( this.eventSelection );
 	}
 
 	// On event dragged

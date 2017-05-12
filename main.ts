@@ -35,8 +35,6 @@ class ElectronMainWindow {
             protocol: 'file:',
             slashes: true
         }))
-
-        console.log( "dirname: ", __dirname );
         
         // Handle print requests
         // NOT COMPLETE, NOT IMPLEMENTED
@@ -52,9 +50,6 @@ class ElectronMainWindow {
         this.window.on( "closed", () => {
             this.window = null
         })
-
-        console.log( "window created" );
-
     }
 
     print( data ): void {

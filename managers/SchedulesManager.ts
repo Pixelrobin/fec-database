@@ -84,7 +84,6 @@ export function init( database: sqlite3.Database ) {
 
     // Create or update an event
     ipcMain.on( "submit-event", ( event, args ) => {
-        console.log( "submitting event ", args.$eventId );
         db.serialize( () => {
             db.run( `
                 INSERT OR REPLACE INTO scheduleData(
