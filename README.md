@@ -1,5 +1,5 @@
 # fec-database
-Program for managing employees, schedules and customer attendance records for a mock family entertainment center business.
+Program for managing employees, schedules and customer attendance records for a mock family entertainment center business. Created for the 2017 FBLA Coding and Programming competition.
 
 ## Overview
 - Written in [Typescript](https://www.typescriptlang.org/) and [SQLite](https://www.sqlite.org/)
@@ -13,10 +13,10 @@ Program for managing employees, schedules and customer attendance records for a 
 - Commercial use of this code would likely require Commercial licenses for Webix and FullCalendar. This implentation uses their open-source versions.
 
 ## File structure
-1. All the managers for getting/setting data in the database are in `managers`.
-2. The modules for each view (schedules, attendance, etc) are under `app/views`
-3. Extra misc. files are under `app/models`. Those are all helpers and reusable ui elements as well as wrappers for communications for other apis (for example, `app/models/WeeklyScheduler.ts` is for creating/communicating with a FullCalendar instance)
-4. The main file is `main.js`
+* All the managers for getting/setting data in the database are in `managers`.
+* The modules for each view (schedules, attendance, etc) are under `app/views`
+* Extra misc. files are under `app/models`. Those are all helpers and reusable ui elements as well as wrappers for communications for other apis (for example, `app/models/WeeklyScheduler.ts` is for creating/communicating with a FullCalendar instance)
+* The main file is `main.js`
 
 ## Building
 In case you wish to build this project from scratch, here are the instructions. This was made for/on windows. It was not tested on other platforms, though it should with minor effort.
