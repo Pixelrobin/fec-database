@@ -23,8 +23,3 @@ body {
     -ms-user-select: none;
     user-select: none;
 }
-
-.webix_list_item {
-    height: 46px !important;
-    line-height: 46px;
-}
