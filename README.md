@@ -16,7 +16,9 @@ Program for managing employees, schedules and customer attendance records for a 
 * All the managers for getting/setting data in the database are in `managers`.
 * The modules for each view (schedules, attendance, etc) are under `app/views`
 * Extra misc. files are under `app/models`. Those are all helpers and reusable ui elements as well as wrappers for communications for other apis (for example, `app/models/WeeklyScheduler.ts` is for creating/communicating with a FullCalendar instance)
+* Modules relating to printing are found under the `printer` folder.
 * The main file is `main.js`
+* Indicudual folders may contain `README.md` files with more information.
 
 ## Building
 In case you wish to build this project from scratch, here are the instructions. This was made for/on windows. It was not tested on other platforms, though it should with minor effort.
