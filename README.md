@@ -1,6 +1,11 @@
 # fec-database
 Program for managing employees, schedules and customer attendance records for a mock family entertainment center business. Created for the 2017 FBLA Coding and Programming competition.
 
+## A note about error handling
+* Code related to error handling is found mostly in the modules under the `managers` folder. The errors are provided by the sqlite3 library in that case. For example, if I misspell "BETWEEN" by accident, a popup would appear to the client as follows:
+![Example Error](error-example.png)
+The only other place that deals with handling errors is found in `main.ts` around line 76, which would occur if a temporary directory failed to be created. All other places should not encounter errors.
+
 ## Overview
 - Written in [Typescript](https://www.typescriptlang.org/) and [SQLite](https://www.sqlite.org/)
 - Run with [electron](https://electron.atom.io/)/[Nodejs](https://nodejs.org/en/)
