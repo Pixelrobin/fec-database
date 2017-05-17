@@ -15,9 +15,9 @@ The only other place that deals with handling errors is found in `main.ts` aroun
 
 ## Notes
 - Though this was created in Typescript, the large amount of javascript files are all libraries I needed to include in the folder structure itself.
-- This was made using webix jet, which wasn't built with Typescript in mind. Therefore, I had to use a few hacky solutions such as the above, and exposing `ipcRender` to the window using index.html.
-- Also because of that, there are two `tsconfig.json` files. The base one is for code to be run on the process, and the one in app is for the renderer process. `main.js` and the files in `managers` use `commonjs`, while everything else uses `requirejs`.
-- Commercial use of this code would likely require Commercial licenses for Webix and FullCalendar. This implentation uses their open-source versions.
+- This was made using webix jet, which wasn't built with Typescript in mind. Therefore, I had to use a few hacky solutions such as the above, and exposing `ipcRenderer` to the window using index.html.
+- Also because of that, there are two `tsconfig.json` files. The base one is for code to be run on the process, and the one in `app` is for the renderer process. `main.js` and the files in `managers` use `commonjs`, while everything else uses `requirejs`.
+- Commercial use of this code would likely require Commercial licenses for Webix and FullCalendar. This implementation uses their open-source versions.
 
 ## File structure
 * All the managers for getting/setting data in the database are in `managers`.
@@ -77,3 +77,4 @@ npm run build-final
     * [Skeleton CSS library](http://getskeleton.com/) used and modified under open-source MIT license. Copyright (c) 2011-2014 Dave Gamache.
     * [moment.js library](https://momentjs.com/) Used under open-source MIT license. Copyright (c) JS Foundation and other contributors.
     * [JQuery library](https://jquery.com/) Used under modified open-source MIT license. Click [here](https://github.com/jquery/jquery/blob/master/LICENSE.txt) for more information. Copyright JS Foundation and other contributors.
+    * There are other libraries that are used by these libraries to function. For copyright information about their specific dependencies, please refer to their individual copyright notices and repositories for more information.
