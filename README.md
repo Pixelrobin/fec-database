@@ -25,7 +25,7 @@ The only other place that deals with handling errors is found in `main.ts` aroun
 * Extra misc. files are under `app/models`. Those are all helpers and reusable ui elements as well as wrappers for communications for other apis (for example, `app/models/WeeklyScheduler.ts` is for creating/communicating with a FullCalendar instance)
 * Modules relating to printing are found under the `printer` folder.
 * The main file is `main.js`
-* Indicudual folders may contain `README.md` files with more information.
+* Individual folders may contain `README.md` files with more information.
 
 ## Building
 In case you wish to build this project from scratch, here are the instructions. This was made for/on windows. It was not tested on other platforms, though it should with minor effort.
