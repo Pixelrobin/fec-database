@@ -4,3 +4,4 @@ app/app.js
 build
 npm-debug.log
 data.db
+example.ts

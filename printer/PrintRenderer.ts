@@ -80,8 +80,7 @@ ipcRenderer.on( "render-print-data", ( event, args ) => {
                 // Multicolumn element (allows mutiple elements per row)
                 case "multicolumn":
                     // Render the elements recursively
-                    // Untested with more than one layer of recursion
-                    // Probably a bad idea to that anyways
+                    // Don't use with more than one layer of recursion though!
                     for ( let columnElements of data.columns ) {
                         parseElement( columnElements, column, data.columns.length );
                     }
