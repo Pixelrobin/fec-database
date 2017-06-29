@@ -1,5 +1,6 @@
 # fec-database
 Program for managing employees, schedules and customer attendance records for a mock family entertainment center business. Created for the 2017 FBLA Coding and Programming competition.
+![Program Screenshot](screenshot.PNG)
 
 ## A note about error handling
 Code related to error handling is found mostly in the modules under the `managers` folder. The errors are provided by the sqlite3 library in that case. For example, if I misspell "BETWEEN" by accident, a popup would appear to the client as follows:
