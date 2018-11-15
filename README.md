@@ -1,5 +1,12 @@
 # fec-database
+---
+
+## :warning: Old Project!
+I made this a while ago, and learned a lot from it, but the code isn't very good.
+
+---
 Program for managing employees, schedules and customer attendance records for a mock family entertainment center business. Created for the 2017 FBLA Coding and Programming competition.
+<br><br>
 ![Program Screenshot](http://i.imgur.com/RlqPdGk.png)
 
 ## Overview
